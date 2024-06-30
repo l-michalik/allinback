@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node dist/server.js",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "npm run build && npm run start"
   },
   "keywords": [],
   "author": "",
