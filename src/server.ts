@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { createLeagues } from './jobs/onetime/createLeagues';
-
+require('dotenv').config()
 const app = express();
 
 const port: number = 3000;
@@ -10,8 +10,10 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  // *****************************
 
-  // CREATE LEAGUES
-  createLeagues();
+  // @JOB CREATE LEAGUES
+  // createLeagues();
+
+  // *****************************
 });
