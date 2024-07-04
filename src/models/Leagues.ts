@@ -26,6 +26,4 @@ const leagueSchema: Schema = new mongoose.Schema<ILeague>({
   }
 })
 
-const League = mongoose.models.League || mongoose.model<ILeague>('League', leagueSchema);
-
-export default League;
+export const League = mongoose.models.League || mongoose.model<ILeague>('League', leagueSchema);

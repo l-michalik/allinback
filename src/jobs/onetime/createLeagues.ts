@@ -1,4 +1,4 @@
-import Leagues, { ILeague } from '../../models/Leagues';
+import { ILeague, League } from '../../models';
 import dbConnect from '../../lib/dbConnect'
 import { createOptions, isArrayEmpty, preventRepeats } from '../../lib/utils';
 
@@ -7,7 +7,10 @@ const axios = require('axios');
 export const createLeagues = async () => {
   const documents: ILeague[] = [];
 
-  const options = createOptions();
+  const options = createOptions({
+    path: 'leagues',
+    params: {}
+  });
 
   try {
     const response = await axios.request(options);
@@ -35,7 +38,7 @@ export const createLeagues = async () => {
   try {
     await dbConnect();
 
-    await Leagues.bulkWrite(data);
+    await League.bulkWrite(data);
     console.log('Leagues created successfully!');
 
   } catch (error) {
