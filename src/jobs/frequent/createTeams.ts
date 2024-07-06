@@ -4,8 +4,6 @@ import { ModelIds } from "../../types";
 import { createOptions, isArrayEmpty, preventRepeats } from "../../lib/utils";
 import axios from "axios";
 
-
-
 export const createTeams = async () => {
   const documents: ITeam[] = [];
   const activeLeaguesIds: ModelIds[] = [];

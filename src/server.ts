@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
-import { createLeagues, createTeams } from './jobs/onetime';
+import { createLeagues } from './jobs/onetime';
+import { createSeasonFixtures, createTeams } from './jobs/frequent';
 require('dotenv').config()
 const app = express();
 
@@ -11,15 +12,19 @@ app.get('/', (req: Request, res: Response) => {
 
 app.listen(port, () => {
   // *****************************
-
   // @JOB CREATE LEAGUES
   // createLeagues();
+  // *****************************
 
+  // *****************************
   // @JOB CREATE TEAMS
   // createTeams();
   /** DESCRIPTION
    * creates teams for active leagues for current year
    */
-  createTeams();
+  // createTeams();
   // *****************************
+
+  // *****************************
+  // createSeasonFixtures();
 });
