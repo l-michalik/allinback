@@ -11,9 +11,9 @@ export const createTeams = async () => {
   try {
     await dbConnect();
     // la liga/premier league/seria a/bundesliga/ligue one
-    // 140/39/71/78/61
+    // 140/39/135/78/61
 
-    const leagues: ModelIds[] = await League.find({ id: { $in: [140, 39, 71, 78, 61] } }).select('id');
+    const leagues: ModelIds[] = await League.find({ id: { $in: [140, 39, 135, 78, 61] } }).select('id');
 
     activeLeaguesIds.push(...leagues)
   } catch (error) {
