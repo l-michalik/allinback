@@ -5,6 +5,17 @@ export const isArrayEmpty = (arr: any[]) => {
 };
 
 export const preventRepeats = (arr: any[]) => {
+  // -----------------
+  // teams config
+  // update: {
+  //   $set: {
+  //     name: doc.name,
+  //       logo: doc.logo,
+  //         league: doc.league
+  //   },
+  //   $addToSet: { season: { $each: doc.season } }
+  // },
+  // -----------------
   return arr.map((doc: any) => ({
     updateOne: {
       filter: { id: doc.id },
@@ -13,8 +24,6 @@ export const preventRepeats = (arr: any[]) => {
     }
   }));
 };
-
-
 
 export const createOptions = ({ params, path }: IOptions) => {
   return {

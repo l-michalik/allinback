@@ -8,26 +8,26 @@ export const createSeasonFixtures = async () => {
   // la liga/premier league/seria a/bundesliga/ligue one
   // 140/39/135/78/61
 
-  const documents: IMatch[] = [];
   const activeLeaguesIds: ModelIds[] = [];
 
   try {
     await dbConnect();
 
-    const leagues: ModelIds[] = await League.find({ id: { $in: [140, 39, 135, 78, 61] } }).select('id');
+    // const leagues: ModelIds[] = await League.find({ id: { $in: [140, 39, 135, 78, 61] } }).select('id');
+    const leagues: ModelIds[] = await League.find({ id: { $in: [140] } }).select('id');
 
     activeLeaguesIds.push(...leagues);
   } catch (error) {
     console.log(error);
   }
 
-  activeLeaguesIds.forEach(async (item) => {
+  const documentsPromises = activeLeaguesIds.map(async (item) => {
 
     const options = createOptions({
       path: "fixtures",
       params: {
         league: `${item.id}`,
-        season: '2024',
+        season: '2023',
         timezone: 'Europe/Warsaw'
       }
     })
@@ -35,14 +35,17 @@ export const createSeasonFixtures = async () => {
     try {
       const response = await axios.request(options);
 
-      const data = await Promise.all(response.data.response.map(async (doc: any) => {
+      return Promise.all(response.data.response.map(async (doc: any) => {
         const fixture = doc.fixture;
         const teams = doc.teams;
-        const _League = await League.findOne({ id: item.id }).select('_id');
-        const _Home = await Team.findOne({ id: teams.home.id }).select('_id');
-        const _Away = await Team.findOne({ id: teams.away.id }).select('_id');
 
-        return {
+        const [_League, _Home, _Away] = await Promise.all([
+          League.findOne({ id: item.id }).select('_id'),
+          Team.findOne({ id: teams.home.id }).select('_id'),
+          Team.findOne({ id: teams.away.id }).select('_id')
+        ]);
+
+        const ret = {
           id: fixture.id,
           date: fixture.date,
           league: _League,
@@ -50,23 +53,26 @@ export const createSeasonFixtures = async () => {
             home: _Home,
             away: _Away
           }
-        };
+        }
+
+        console.log(ret);
+
+        return ret;
       }));
 
-      documents.push(...data);
     } catch (error) {
       console.error(error);
     }
   });
 
-  if (isArrayEmpty(documents)) return;
+  const documents = await Promise.all(documentsPromises);
 
-  const data = preventRepeats(documents);
+  if (isArrayEmpty(documents)) return;
 
   try {
     await dbConnect();
 
-    await Match.bulkWrite(data);
+    await Match.insertMany(documents);
 
     console.log('SUCCESS!');
 
