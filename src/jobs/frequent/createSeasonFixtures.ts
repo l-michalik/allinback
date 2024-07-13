@@ -4,7 +4,7 @@ import { IMatch, League, Match, Team } from "../../models";
 import { ModelIds } from "../../types";
 import axios from "axios";
 
-export const createSeasonFixtures = async () => {
+export const createSeasonFixtures = async (year: number) => {
   // la liga/premier league/seria a/bundesliga/ligue one
   // 140/39/135/78/61
 
@@ -21,16 +21,15 @@ export const createSeasonFixtures = async () => {
     console.log(error);
   }
 
-  const documentsPromises = activeLeaguesIds.map(async (item) => {
-
+  const documentsPromises = activeLeaguesIds.flatMap(async (item) => {
     const options = createOptions({
       path: "fixtures",
       params: {
         league: `${item.id}`,
-        season: '2023',
+        season: `${year}`,
         timezone: 'Europe/Warsaw'
       }
-    })
+    });
 
     try {
       const response = await axios.request(options);
@@ -45,7 +44,7 @@ export const createSeasonFixtures = async () => {
           Team.findOne({ id: teams.away.id }).select('_id')
         ]);
 
-        const ret = {
+        return {
           id: fixture.id,
           date: fixture.date,
           league: _League,
@@ -53,29 +52,27 @@ export const createSeasonFixtures = async () => {
             home: _Home,
             away: _Away
           }
-        }
-
-        console.log(ret);
-
-        return ret;
+        };
       }));
 
     } catch (error) {
       console.error(error);
+      return [];
     }
   });
 
-  const documents = await Promise.all(documentsPromises);
+  const documents = (await Promise.all(documentsPromises)).flat();
 
   if (isArrayEmpty(documents)) return;
+
+  const data = preventRepeats(documents);
 
   try {
     await dbConnect();
 
-    await Match.insertMany(documents);
+    await Match.bulkWrite(data);
 
-    console.log('SUCCESS!');
-
+    console.log(`Season fixtures for year ${year} have been created!`);
   } catch (error) {
     console.log(error);
   }

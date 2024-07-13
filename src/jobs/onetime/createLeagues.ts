@@ -1,3 +1,4 @@
+// WORKS AS EXPECTED
 import { ILeague, League } from '../../models';
 import dbConnect from '../../lib/dbConnect'
 import { createOptions, isArrayEmpty, preventRepeats } from '../../lib/utils';

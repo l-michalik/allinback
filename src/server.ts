@@ -11,20 +11,27 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
+
+  // la liga/premier league/seria a/bundesliga/ligue one
+  // 140/39/135/78/61
+
   // *****************************
-  // @JOB CREATE LEAGUES
+  // @JOB
+  // desc : create all available leagues
   // createLeagues();
   // *****************************
 
   // *****************************
-  // @JOB CREATE TEAMS
-  // createTeams();
-  /** DESCRIPTION
-   * creates teams for active leagues for current year
-   */
-  // createTeams();
+  // @JOB
+  // desc : create teams based on leagues id's for specific year
+  // params : year = 2021
+  // createTeams(2024);
   // *****************************
 
   // *****************************
-  // createSeasonFixtures();
+  // @JOB
+  // desc : create fixtures based on leagues id's for specific year
+  // params : year = 2021
+  // createSeasonFixtures(2024);
+  // *****************************
 });

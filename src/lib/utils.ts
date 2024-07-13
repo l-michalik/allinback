@@ -4,22 +4,18 @@ export const isArrayEmpty = (arr: any[]) => {
   return !Array.isArray(arr) || arr.length === 0
 };
 
-export const preventRepeats = (arr: any[]) => {
-  // -----------------
-  // teams config
-  // update: {
-  //   $set: {
-  //     name: doc.name,
-  //       logo: doc.logo,
-  //         league: doc.league
-  //   },
-  //   $addToSet: { season: { $each: doc.season } }
-  // },
-  // -----------------
+export const preventRepeats = (arr: any[], model?: string) => {
   return arr.map((doc: any) => ({
     updateOne: {
       filter: { id: doc.id },
-      update: { $set: doc },
+      update: model === 'teams' ? {
+        $set: {
+          name: doc.name,
+          logo: doc.logo,
+          league: doc.league
+        },
+        $addToSet: { season: { $each: doc.season } }
+      } : { $set: doc },
       upsert: true
     }
   }));
