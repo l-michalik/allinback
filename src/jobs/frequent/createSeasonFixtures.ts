@@ -36,6 +36,7 @@ export const createSeasonFixtures = async (year: number) => {
 
       return Promise.all(response.data.response.map(async (doc: any) => {
         const fixture = doc.fixture;
+        const goals = doc.goals;
         const teams = doc.teams;
 
         const [_League, _Home, _Away] = await Promise.all([
@@ -47,10 +48,15 @@ export const createSeasonFixtures = async (year: number) => {
         return {
           id: fixture.id,
           date: fixture.date,
+          timestamp: fixture.timestamp,
           league: _League,
           teams: {
             home: _Home,
             away: _Away
+          },
+          goals: {
+            home: goals.home,
+            away: goals.away
           }
         };
       }));
