@@ -14,6 +14,7 @@ export const preventRepeats = (arr: any[], model?: string) => {
           logo: doc.logo,
           league: doc.league
         },
+        // check if workds properly on double season 
         $addToSet: { season: { $each: doc.season } }
       } : { $set: doc },
       upsert: true
