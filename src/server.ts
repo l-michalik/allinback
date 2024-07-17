@@ -1,9 +1,10 @@
 import express, { Request, Response } from "express";
 import { Telegram } from "./lib/telegram";
+import { createSeasonFixtures, createTeams, getDailyUpdate } from "./jobs/frequent";
 require("dotenv").config();
 const app = express();
 
-const port: number = 3000;
+const port: number = 3001;
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Root is running...");
@@ -39,13 +40,6 @@ app.listen(port, () => {
   // updateTeamForm();
   // *****************************
 
-  Telegram.sendMessage({
-    message: "TEST",
-  });
-
-  Telegram.sendMessage({
-    message: {
-      siema: 123,
-    },
-  });
+  // *****************************
+  // getDailyUpdate();
 });
