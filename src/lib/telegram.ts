@@ -6,7 +6,6 @@ export const CHAT_IDS = {
   ANTEQ: 6021707546,
 };
 
-
 if (!process.env.TELEGRAM_BOT_TOKEN_ACCESS) throw new Error(`Missing env: TELEGRAM_BOT_TOKEN_ACCESS`);
 
 export class Telegram {
@@ -14,8 +13,15 @@ export class Telegram {
     handlerTimeout: 20_000,
   });
 
-  static async sendMessage({ chatId, message, extraOptions }: SendMessageParams) {
-    await this.client.telegram.sendMessage(chatId, message, {
+  static castToJSONMessage = (input: object) => `
+	\`\`\`json
+	${JSON.stringify(input)}
+	\`\`\``;
+
+  static async sendMessage({ chatId = CHAT_IDS.BASE_GROUP, message, extraOptions }: SendMessageParams) {
+    const messageStringified = typeof message === "object" ? Telegram.castToJSONMessage(message) : message;
+
+    await this.client.telegram.sendMessage(chatId, messageStringified, {
       parse_mode: "MarkdownV2",
       protect_content: true,
       ...extraOptions,
@@ -24,7 +30,7 @@ export class Telegram {
 }
 
 export interface SendMessageParams {
-  chatId: number | string;
-  message: string;
+  chatId?: number | string;
+  message: string | object;
   extraOptions?: Parameters<_Telegram["sendMessage"]>["2"];
 }

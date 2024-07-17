@@ -1,17 +1,15 @@
-import express, { Request, Response } from 'express';
-import { createLeagues } from './jobs/onetime';
-import { createSeasonFixtures, createTeams, updateTeamForm } from './jobs/frequent';
-require('dotenv').config()
+import express, { Request, Response } from "express";
+import { Telegram } from "./lib/telegram";
+require("dotenv").config();
 const app = express();
 
 const port: number = 3000;
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Root is running...');
+app.get("/", (req: Request, res: Response) => {
+  res.send("Root is running...");
 });
 
 app.listen(port, () => {
-
   // la liga/premier league/seria a/bundesliga/ligue one
   // 140/39/135/78/61
 
@@ -41,5 +39,13 @@ app.listen(port, () => {
   // updateTeamForm();
   // *****************************
 
+  Telegram.sendMessage({
+    message: "TEST",
+  });
 
+  Telegram.sendMessage({
+    message: {
+      siema: 123,
+    },
+  });
 });
