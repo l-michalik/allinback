@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { createLeagues } from './jobs/onetime';
-import { createSeasonFixtures, createTeams } from './jobs/frequent';
+import { createSeasonFixtures, createTeams, updateTeamForm } from './jobs/frequent';
 require('dotenv').config()
 const app = express();
 
@@ -34,4 +34,12 @@ app.listen(port, () => {
   // params : year = 2021
   // createSeasonFixtures(2024);
   // *****************************
+
+  // *****************************
+  // @JOB
+  // desc : update form for teams based on last 5 matches
+  // updateTeamForm();
+  // *****************************
+
+
 });
