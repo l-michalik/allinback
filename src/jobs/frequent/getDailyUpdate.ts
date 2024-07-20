@@ -30,7 +30,7 @@ export const getDailyUpdate = async () => {
 
       const nearestMatch = await Match.find({ timestamp: { $gte: Math.floor(Date.now() / 1000) } })
         .sort({ timestamp: 1 })
-        .limit(1);
+        .limit(1)
 
       const nearestMatchDate = new Date(nearestMatch[0].date);
 
@@ -43,21 +43,36 @@ export const getDailyUpdate = async () => {
 
     // TEST SCRIPT
 
-    // get matches from the nearest date match one for now ()
-    // matches = await Match.find({
-    //   timestamp: {
-    //     $gte: getStartTimestamp(0),
-    //     $lt: getStartTimestamp(1)
-    //   }
-    // });
+    // get matches from the nearest date match
 
     // TEST SCRIPT
 
-    // get matches from the nearest date match one for now ()
-    // view teama vs teamb at date (telegram info)
-    // send predictions for last 5 matches under, over, archaic buk odd
+    // view teama vs teamb at date
 
-    console.log('s');
+    // goals/goals-home/goaly-away last five matches
+    /*
+      goals shot shot
+      -0.5 | 80% | 1.00 / +0.5 | 20% | 2.00
+      -1.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+      -2.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+      -3.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+      -4.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+
+      goals a shot miss
+      team a score or team b lose 
+      -0.5 | 80% | 1.00 / +0.5 | 20% | 2.00
+      -1.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+      -2.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+      -3.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+      -4.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+
+      goals b miss shot
+      -0.5 | 80% | 1.00 / +0.5 | 20% | 2.00
+      -1.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+      -2.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+      -3.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+      -4.5 | 80% | 2.00 / +0.5 | 20% | 2.00
+    */
 
   } catch (error) {
     console.log(error);
