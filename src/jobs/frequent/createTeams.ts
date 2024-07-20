@@ -12,7 +12,7 @@ export const createTeams = async (year: number) => {
   try {
     await dbConnect();
 
-    const leagues: ModelIds[] = await League.find({ id: { $in: [140] } }).select('id');
+    const leagues: ModelIds[] = await League.find({ id: { $in: [106] } }).select('id');
 
     activeLeaguesIds.push(...leagues)
   } catch (error) {
