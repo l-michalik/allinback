@@ -14,8 +14,8 @@ export const getDailyUpdate = async () => {
     matches = await Match
       .find({
         timestamp: {
-          $gte: getStartTimestamp(date, 0),
-          $lt: getStartTimestamp(date, 1),
+          $gte: getStartTimestamp(date, 1),
+          $lt: getStartTimestamp(date, 2),
         },
       })
       .sort({ timestamp: 1 })
