@@ -42,10 +42,10 @@ app.listen(port, () => {
   // *****************************
 
   // *****************************
-  // getDailyUpdate();
+  getDailyUpdate();
 
 
   // 
-  getDailyPredictions();
+  // getDailyPredictions();
   // runBackTest();
 });
