@@ -34,25 +34,14 @@ export const createOptions = ({ params, path }: IOptions) => {
   }
 }
 
-export function getTomorrowStartTimestamp(): number {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  tomorrow.setHours(0, 0, 0, 0);
-  return Math.floor(tomorrow.getTime() / 1000);
+export function getStartTimestamp(date: Date, daysFromNow: number,): number {
+  date.setDate(date.getDate() + daysFromNow);
+  date.setHours(0, 0, 0, 0);
+  return Math.floor(date.getTime() / 1000);
 }
 
-export function getDayAfterTomorrowStartTimestamp(): number {
-  const dayAfterTomorrow = new Date();
-  dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-  dayAfterTomorrow.setHours(0, 0, 0, 0);
-  return Math.floor(dayAfterTomorrow.getTime() / 1000);
-}
-
-export function getFormattedDate() {
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  return tomorrow.toLocaleDateString('en-US', {
+export function getFormattedDate(date: Date): string {
+  return date.toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
