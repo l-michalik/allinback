@@ -1,6 +1,6 @@
-import mongoose, { Document, Number, Schema } from "mongoose";
+import mongoose, { Document, Number, ObjectId, Schema } from "mongoose";
 
-export interface ITeam extends Document {
+export interface ITeam extends Required<Document<ObjectId>> {
   id: number;
   name: string;
   logo: string;
