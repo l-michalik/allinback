@@ -72,19 +72,22 @@ export function getNextDay() {
 }
 
 export async function getLastTeamMatches(team: ITeam, date: Date) {
-  return Match
-    .find({
-      $or: [
-        { "teams.home": team },
-        { "teams.away": team },
-      ],
-      timestamp: {
-        $lt: date.getTime() / 1000,
-      }
-    })
+  const oneMonthAgo = new Date(date);
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 6); //  change to 1
+
+  return Match.find({
+    $or: [
+      { "teams.home": team },
+      { "teams.away": team },
+    ],
+    timestamp: {
+      $gte: oneMonthAgo.getTime() / 1000,
+      $lt: date.getTime() / 1000,
+    }
+  })
     .limit(5)
     .sort({ timestamp: -1 })
-    .select('goals')
+    .select('goals');
 }
 
 export function getFixturePrediction(value: number, stats: number[]) {

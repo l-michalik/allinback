@@ -1,4 +1,3 @@
-add condition to return only matches from last month
 add note [Based on X matches]
 fix mismatched goals home & away currently works bad
 add description which data must be updated day by day
