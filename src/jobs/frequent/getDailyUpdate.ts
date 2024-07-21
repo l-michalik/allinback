@@ -60,7 +60,7 @@ export const getDailyUpdate = async () => {
 
       fixtureName.forEach((event: any, i: number) => {
         const stats = getStats(event, homeTeamGoals, awayTeamGoals);
-        console.log(`[${stats.length}] ${i + 1}. ${event}:`);
+        console.log(`${i + 1}. ${event} [Based on (${stats.length}) fixtures]:`);
 
         fixtureValues.forEach((value: any) => {
           console.log(getFixturePrediction(value, stats));

@@ -1,4 +1,3 @@
-add note [Based on X matches]
 fix mismatched goals home & away currently works bad
 add description which data must be updated day by day
 iff predicttion over 75% add prediction model to db
