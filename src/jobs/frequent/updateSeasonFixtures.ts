@@ -4,7 +4,7 @@ import { IMatch, League, Match, Team } from "../../models";
 import { ModelIds } from "../../types";
 import axios from "axios";
 
-export const createSeasonFixtures = async (year: number) => {
+export const updateSeasonFixtures = async (year: number) => {
   // la liga/premier league/seria a/bundesliga/ligue one
   // 140/39/135/78/61
 

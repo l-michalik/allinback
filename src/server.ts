@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import { Telegram } from "./lib/telegram";
-import { createSeasonFixtures, createTeams, getDailyPredictions, getDailyUpdate, updateTeamForm } from "./jobs/frequent";
+import { updateSeasonFixtures, createTeams, getDailyPredictions, getDailyUpdate, updateTeamForm } from "./jobs/frequent";
 import { createLeagues } from "./jobs/onetime";
 require("dotenv").config();
 const app = express();
@@ -32,7 +32,7 @@ app.listen(port, () => {
   // @JOB
   // desc : create fixtures based on leagues id's for specific year
   // params : year = 2021
-  // createSeasonFixtures(2024);
+  // updateSeasonFixtures(2024);
   // *****************************
 
   // *****************************
@@ -42,7 +42,7 @@ app.listen(port, () => {
   // *****************************
 
   // *****************************
-  getDailyUpdate();
+  // getDailyUpdate();
 
 
   // 
