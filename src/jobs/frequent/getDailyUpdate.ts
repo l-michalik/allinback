@@ -1,4 +1,4 @@
-import { getFixturePrediction, getFormattedDate, getTeamGoals, getFormattedHour, getLastTeamMatches, getStartTimestamp, getStats } from "../../lib/utils";
+import { getFixturePrediction, getFormattedDate, getTeamGoals, getFormattedHour, getLastTeamMatches, getStartTimestamp, getStats, filterProbabilities } from "../../lib/utils";
 import { fixtureName, fixtureValues } from "../../constants";
 import { IMatch, Match } from "../../models";
 import dbConnect from "../../lib/dbConnect";
@@ -62,9 +62,11 @@ export const getDailyUpdate = async () => {
         const stats = getStats(event, homeTeamGoals, awayTeamGoals);
         console.log(`${i + 1}. ${event} [Based on (${stats.length}) fixtures]:`);
 
-        fixtureValues.forEach((value: any) => {
-          console.log(getFixturePrediction(value, stats));
-        });
+        const fixturePrediction = getFixturePrediction(fixtureValues, stats);
+
+        const fixtureProbabilities = filterProbabilities(fixturePrediction);
+
+        console.log(fixtureProbabilities);
       });
     }
   } catch (error) {

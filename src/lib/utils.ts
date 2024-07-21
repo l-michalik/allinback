@@ -91,12 +91,21 @@ export async function getLastTeamMatches(team: ITeam, date: Date) {
     .populate("teams.away", "name id");
 }
 
-export function getFixturePrediction(value: number, stats: number[]) {
-  const bookmakerRate = 1.00;
-  const greater = (stats.filter(stat => stat > value).length / stats.length * 100).toFixed(2);
-  const less = (stats.filter(stat => stat < value).length / stats.length * 100).toFixed(2);
+export function getFixturePrediction(fixtureValues: number[], stats: number[]) {
+  const underEvents = fixtureValues.map(value => ({
+    value: value,
+    probability: ((stats.filter(stat => stat < value).length / stats.length) * 100)
+  }));
 
-  return `-${value} | ${less}% | ${bookmakerRate} [x] +${value} | ${greater}% | ${bookmakerRate}`
+  const overEvents = fixtureValues.map(value => ({
+    value: value,
+    probability: ((stats.filter(stat => stat > value).length / stats.length) * 100)
+  }));
+
+  return {
+    under: underEvents,
+    over: overEvents
+  };
 }
 
 export function getTeamGoals(teamId: number, matches: any) {
@@ -127,6 +136,22 @@ export function getStats(event: string, homeTeamGoals: any, awayTeamGoals: any) 
     result = homeTeamGoals.scored.concat(awayTeamGoals.conceded);
   } else if (event === 'Total - Away') {
     result = homeTeamGoals.conceded.concat(awayTeamGoals.scored);
+  }
+
+  return result;
+}
+
+export function filterProbabilities(data: any) {
+  const result: any = {};
+
+  const underCandidates = data.under.filter((item: any) => item.probability > 75);
+  if (underCandidates.length > 0) {
+    result.under = underCandidates.reduce((min: any, item: any) => item.value < min.value ? item : min);
+  }
+
+  const overCandidates = data.over.filter((item: any) => item.probability > 75);
+  if (overCandidates.length > 0) {
+    result.over = overCandidates.reduce((max: any, item: any) => item.value > max.value ? item : max);
   }
 
   return result;
