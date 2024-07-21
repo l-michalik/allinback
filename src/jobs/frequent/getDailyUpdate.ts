@@ -55,8 +55,8 @@ export const getDailyUpdate = async () => {
       const lastMatchesHomeTeam = await getLastTeamMatches(homeTeam, date);
       const lastMatchesAwayTeam = await getLastTeamMatches(awayTeam, date);
 
-      const homeTeamGoals = getTeamGoals(lastMatchesHomeTeam);
-      const awayTeamGoals = getTeamGoals(lastMatchesAwayTeam);
+      const homeTeamGoals = getTeamGoals(homeTeam.id, lastMatchesHomeTeam);
+      const awayTeamGoals = getTeamGoals(awayTeam.id, lastMatchesAwayTeam);
 
       fixtureName.forEach((event: any, i: number) => {
         const stats = getStats(event, homeTeamGoals, awayTeamGoals);

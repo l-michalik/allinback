@@ -87,7 +87,8 @@ export async function getLastTeamMatches(team: ITeam, date: Date) {
   })
     .limit(5)
     .sort({ timestamp: -1 })
-    .select('goals');
+    .populate("teams.home", "name id")
+    .populate("teams.away", "name id");
 }
 
 export function getFixturePrediction(value: number, stats: number[]) {
@@ -98,12 +99,17 @@ export function getFixturePrediction(value: number, stats: number[]) {
   return `-${value} | ${less}% | ${bookmakerRate} [x] +${value} | ${greater}% | ${bookmakerRate}`
 }
 
-export function getTeamGoals(matches: any) {
+export function getTeamGoals(teamId: number, matches: any) {
   let scored: number[] = [], conceded: number[] = [];
 
-  matches.map((match: IMatch) => {
-    scored.push(match.goals.home);
-    conceded.push(match.goals.away);
+  matches.map((match: any) => {
+    if (match.teams.home.id === teamId) {
+      scored.push(match.goals.home);
+      conceded.push(match.goals.away);
+    } else if (match.teams.away.id === teamId) {
+      scored.push(match.goals.away);
+      conceded.push(match.goals.home);
+    }
   });
 
   return {
