@@ -2,7 +2,6 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IMatch extends Document {
   id: number;
-  date: string;
   timestamp: number;
   league: Schema.Types.ObjectId;
   teams: {
@@ -19,10 +18,6 @@ const matchSchema: Schema = new mongoose.Schema<IMatch>({
   id: {
     type: Number,
     required: true,
-  },
-  date: {
-    type: String,
-    required: true
   },
   timestamp: {
     type: Number,

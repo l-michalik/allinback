@@ -23,14 +23,14 @@ app.listen(port, () => {
   // @JOB
   // desc : create teams based on leagues id's for specific year
   // params : year = 2021
-  createTeams(2024);
+  // createTeams(2024);
   // *****************************
 
   // *****************************
   // @JOB
   // desc : create fixtures based on leagues id's for specific year
   // params : year = 2021
-  // updateSeasonFixtures(2024);
+  updateSeasonFixtures(2024);
   // *****************************
 
   // *****************************
