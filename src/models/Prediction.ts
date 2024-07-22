@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-enum PredictionStatus {
+export enum PredictionStatus {
   PENDING = 'PENDING',
   SUCCESS = 'SUCCESS',
   FAILED = 'FAILED',

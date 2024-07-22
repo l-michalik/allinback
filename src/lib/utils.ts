@@ -74,7 +74,7 @@ export function getNextDay() {
 
 export async function getLastTeamMatches(team: ITeam, date: Date) {
   const oneMonthAgo = new Date(date);
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 6); //  change to 1
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 2);
 
   return Match.find({
     $or: [
@@ -86,7 +86,6 @@ export async function getLastTeamMatches(team: ITeam, date: Date) {
       $lt: date.getTime() / 1000,
     }
   })
-    .limit(5)
     .sort({ timestamp: -1 })
     .populate("teams.home", "name id")
     .populate("teams.away", "name id");
