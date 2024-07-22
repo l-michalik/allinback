@@ -1,5 +1,6 @@
 import { createOptions, isArrayEmpty, preventRepeats } from "../../lib/utils";
 import { IMatch, League, Match, Team } from "../../models";
+import { supportedLigues } from "../../constants";
 import dbConnect from "../../lib/dbConnect";
 import { ModelIds } from "../../types";
 import axios from "axios";
@@ -10,7 +11,7 @@ export const updateSeasonFixtures = async (year: number) => {
   try {
     await dbConnect();
 
-    const leagues: ModelIds[] = await League.find({ id: { $in: [106, 39] } }).select('id name');
+    const leagues: ModelIds[] = await League.find({ id: { $in: supportedLigues } }).select('id name');
 
     activeLeaguesIds.push(...leagues);
   } catch (error) {
@@ -79,66 +80,4 @@ export const updateSeasonFixtures = async (year: number) => {
 
     }, 10000 * i);
   }
-
-  // const documentsPromises = activeLeaguesIds.flatMap(async (item) => {
-  // const options = createOptions({
-  //   path: "fixtures",
-  //   params: {
-  //     league: `${item.id}`,
-  //     season: `${year}`,
-  //     timezone: 'Europe/Warsaw'
-  //   }
-  // });
-
-  //   try {
-  // const response = await axios.request(options);
-
-  // return Promise.all(response.data.response.map(async (doc: any) => {
-  //   const fixture = doc.fixture;
-  //   const goals = doc.goals;
-  //   const teams = doc.teams;
-
-  //   const [_League, _Home, _Away] = await Promise.all([
-  //     League.findOne({ id: item.id }).select('_id'),
-  //     Team.findOne({ id: teams.home.id }).select('_id'),
-  //     Team.findOne({ id: teams.away.id }).select('_id')
-  //   ]);
-
-  //   return {
-  //     id: fixture.id,
-  //     date: fixture.date,
-  //     timestamp: fixture.timestamp,
-  //     league: _League,
-  //     teams: {
-  //       home: _Home,
-  //       away: _Away
-  //     },
-  //     goals: {
-  //       home: goals.home,
-  //       away: goals.away
-  //     }
-  //   };
-  // }));
-
-  //   } catch (error) {
-  //     console.error(error);
-  //     return [];
-  //   }
-  // });
-
-  // const documents = (await Promise.all(documentsPromises)).flat();
-
-  // if (isArrayEmpty(documents)) return;
-
-  // const data = preventRepeats(documents);
-
-  // try {
-  //   await dbConnect();
-
-  //   await Match.bulkWrite(data);
-
-  //   console.log(`Season fixtures for year ${year} have been created!`);
-  // } catch (error) {
-  //   console.log(error);
-  // }
 }

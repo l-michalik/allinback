@@ -30,7 +30,7 @@ app.listen(port, () => {
   // @JOB
   // desc : create fixtures based on leagues id's for specific year
   // params : year = 2021
-  updateSeasonFixtures(2024);
+  // updateSeasonFixtures(2024);
   // *****************************
 
   // *****************************

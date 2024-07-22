@@ -10,7 +10,6 @@ export interface IPrediction extends Document {
   fixtureId: number;
   name: string;
   value: string;
-  bookmakerRate: number;
   devProbability: number;
   status: PredictionStatus;
 }
@@ -26,10 +25,6 @@ const predictionSchema: Schema = new mongoose.Schema<IPrediction>({
   },
   value: {
     type: String,
-    required: true,
-  },
-  bookmakerRate: {
-    type: Number,
     required: true,
   },
   devProbability: {
