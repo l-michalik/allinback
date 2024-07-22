@@ -9,8 +9,10 @@ export enum PredictionStatus {
 export interface IPrediction extends Document {
   fixtureId: number;
   name: string;
-  value: string;
-  devProbability: number;
+  betName: string;
+  betValue: number;
+  probability: number;
+  timestamp: number;
   status: PredictionStatus;
 }
 
@@ -23,13 +25,21 @@ const predictionSchema: Schema = new mongoose.Schema<IPrediction>({
     type: String,
     required: true,
   },
-  value: {
+  betName: {
     type: String,
     required: true,
   },
-  devProbability: {
+  betValue: {
     type: Number,
     required: true,
+  },
+  probability: {
+    type: Number,
+    required: true,
+  },
+  timestamp: {
+    type: Number,
+    required: true
   },
   status: {
     type: String,

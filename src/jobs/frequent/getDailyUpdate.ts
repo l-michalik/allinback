@@ -80,7 +80,9 @@ export const getDailyUpdate = async () => {
           const prediction = {
             fixtureId: match.id,
             name: event,
-            value: `${key} : ${fixtureProbabilities[key].value}`,
+            betName: key,
+            betValue: fixtureProbabilities[key].value,
+            timestamp: match.timestamp,
             devProbability: fixtureProbabilities[key].probability,
             status: PredictionStatus.PENDING
           }
@@ -101,7 +103,7 @@ export const getDailyUpdate = async () => {
         filter: {
           fixtureId: prediction.fixtureId,
           name: prediction.name,
-          value: prediction.value
+          betName: prediction.betName
         },
         update: {
           $setOnInsert: {

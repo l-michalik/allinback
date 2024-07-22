@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { Telegram } from "./lib/telegram";
 import { updateSeasonFixtures, createTeams, getDailyUpdate } from "./jobs/frequent";
 import { createLeagues } from "./jobs/onetime";
+import { updatePredictions } from "./jobs/frequent/updatePredictions";
 require("dotenv").config();
 const app = express();
 
@@ -34,10 +35,11 @@ app.listen(port, () => {
   // *****************************
 
   // *****************************
-  getDailyUpdate();
+  // getDailyUpdate();
 
 
   // 
-  // getDailyPredictions();
+  // updatePredictions();
+
   // runBackTest();
 });
