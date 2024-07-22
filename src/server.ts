@@ -38,11 +38,7 @@ app.listen(port, () => {
   // *****************************
   // getDailyUpdate();
 
-
-  //
   // updatePredictions();
 
-  // runBackTest();
-
-  makeTest();
+  // makeTest();
 });
