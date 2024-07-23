@@ -1,1 +1,3 @@
-add backup function that check if it is correct success [1] error [5] success [1] error [2]
+// check all bets from 365 bets
+// stats and connect it to the match
+// start writing logic that will handle all cases
