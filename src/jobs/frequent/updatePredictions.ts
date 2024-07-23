@@ -31,6 +31,7 @@ export const updatePredictions = async () => {
     }
     console.log('Predictions updated');
 
+
   } catch (error) {
     console.error(error);
   }

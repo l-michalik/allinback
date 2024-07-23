@@ -72,7 +72,9 @@ export const updateSeasonFixtures = async (year: number) => {
 
         await Match.bulkWrite(data);
 
-        console.log(`Season fixtures for ${ligue.name} #[${ligue.id}] : ${year} created successfully! [${documents.length}]`);
+        console.log(`Loading... (${i / supportedLigues.length})`);
+
+        console.log(`Season fixtures for ${ligue.name} #[${ligue.id}] : ${year} updated successfully! [${documents.length}]`);
 
       } catch (error) {
         console.log(error);

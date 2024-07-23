@@ -83,7 +83,7 @@ export const getDailyUpdate = async () => {
             betName: key,
             betValue: fixtureProbabilities[key].value,
             timestamp: match.timestamp,
-            devProbability: fixtureProbabilities[key].probability,
+            probability: fixtureProbabilities[key].probability,
             status: PredictionStatus.PENDING
           }
 
