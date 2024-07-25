@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express';
-import { createLeagues } from './jobs/onetime/createLeagues';
 
 const app = express();
 
@@ -11,7 +10,4 @@ app.get('/', (req: Request, res: Response) => {
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
-
-  // CREATE LEAGUES
-  createLeagues();
 });
