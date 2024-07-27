@@ -1,4 +1,7 @@
 import express, { Request, Response } from 'express';
+import { createFixtures } from './jobs/createFixtures';
+
+require("dotenv").config();
 
 const app = express();
 
@@ -9,5 +12,5 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  createFixtures(2023);
 });
