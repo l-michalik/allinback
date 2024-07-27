@@ -15,3 +15,19 @@ export const createOptions = ({ params, path }: IOptions) => {
 export const isArrayEmpty = (arr: any[]) => {
   return !Array.isArray(arr) || arr.length === 0;
 };
+
+export function formatDate(dateString: string): string {
+  const date: Date = new Date(dateString);
+  
+  const options: Intl.DateTimeFormatOptions = { 
+    weekday: 'long', 
+    day: 'numeric', 
+    month: 'long'
+  };
+
+  return date.toLocaleDateString('en-US', options);
+}
+
+export function padStringWithSpaces(str: string, targetLength: number): string {
+  return str.padEnd(targetLength, ' ');
+}

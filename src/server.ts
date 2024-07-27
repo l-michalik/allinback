@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { createFixtures } from './jobs/createFixtures';
+import { runBacktest } from './jobs/runBacktest';
 
 require("dotenv").config();
 
@@ -12,5 +12,5 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
-  createFixtures(2023);
+  runBacktest();
 });
