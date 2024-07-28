@@ -5,7 +5,7 @@ export interface IOptions {
   path: string;
 }
 
-export const enum EventTypesStatusEnum {
+export const enum EventStatusEnum {
   'PENDING' = 'PENDING',
   'SUCCESS' = 'SUCCESS',
   'FAILED' = 'FAILED',
@@ -13,7 +13,7 @@ export const enum EventTypesStatusEnum {
 
 export interface ILikelyType {
   fixtureId: number;
-  status: EventTypesStatusEnum;
+  status: EventStatusEnum;
   type: EventTypesEnum;
   name: string;
   value: string | number;

@@ -1,4 +1,4 @@
-import { EventTypesStatusEnum, ILikelyType } from "../types";
+import { EventStatusEnum, ILikelyType } from "../types";
 import { EventTypesEnum } from "../constants";
 import { getPercentage } from ".";
 
@@ -20,7 +20,7 @@ export function calculateMatchResultPercentages(
   if (homeWinPercentage >= 75) {
     result.push({
       fixtureId,
-      status: EventTypesStatusEnum.PENDING,
+      status: EventStatusEnum.PENDING,
       type: EventTypesEnum["Wynik meczu (z wyłączeniem dogrywki)"],
       name: `${homeTeam}`,
       value: "WIN",
@@ -36,7 +36,7 @@ export function calculateMatchResultPercentages(
   if (drawPercentage >= 75) {
     result.push({
       fixtureId,
-      status: EventTypesStatusEnum.PENDING,
+      status: EventStatusEnum.PENDING,
       type: EventTypesEnum["Wynik meczu (z wyłączeniem dogrywki)"],
       name: "Remis",
       value: "Remis",
@@ -53,7 +53,7 @@ export function calculateMatchResultPercentages(
   if (awayWinPercentage >= 75) {
     result.push({
       fixtureId,
-      status: EventTypesStatusEnum.PENDING,
+      status: EventStatusEnum.PENDING,
       type: EventTypesEnum["Wynik meczu (z wyłączeniem dogrywki)"],
       name: `${awayTeam}`,
       value: `WIN`,
@@ -65,6 +65,22 @@ export function calculateMatchResultPercentages(
   return result;
 }
 
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
 // ##############################################
 
 export function calculateDoubleChancePercentages(
@@ -87,7 +103,7 @@ export function calculateDoubleChancePercentages(
   if (homeWinOrDrawPercentage >= 75) {
     result.push({
       fixtureId,
-      status: EventTypesStatusEnum.PENDING,
+      status: EventStatusEnum.PENDING,
       type: EventTypesEnum["Podwójna szansa"],
       name: `${homeTeam} or Draw`,
       value: "HOME_OR_DRAW",
@@ -106,7 +122,7 @@ export function calculateDoubleChancePercentages(
   if (homeWinOrAwayPercentage >= 75) {
     result.push({
       fixtureId,
-      status: EventTypesStatusEnum.PENDING,
+      status: EventStatusEnum.PENDING,
       type: EventTypesEnum["Podwójna szansa"],
       name: `${homeTeam} or ${awayTeam}`,
       value: "HOME_OR_AWAY",
@@ -125,7 +141,7 @@ export function calculateDoubleChancePercentages(
   if (awayWinOrDrawPercentage >= 75) {
     result.push({
       fixtureId,
-      status: EventTypesStatusEnum.PENDING,
+      status: EventStatusEnum.PENDING,
       type: EventTypesEnum["Podwójna szansa"],
       name: `${awayTeam} or Draw`,
       value: "AWAY_OR_DRAW",
@@ -159,7 +175,7 @@ export function calculateOverUnderPercentages(
     if (overPercentage >= 75) {
       result.push({
         fixtureId,
-        status: EventTypesStatusEnum.PENDING,
+        status: EventStatusEnum.PENDING,
         type: EventTypesEnum["Gole Powyżej/Poniżej"],
         name: `Over ${threshold}`,
         value: overKey,
@@ -177,7 +193,7 @@ export function calculateOverUnderPercentages(
     if (underPercentage >= 75) {
       result.push({
         fixtureId,
-        status: EventTypesStatusEnum.PENDING,
+        status: EventStatusEnum.PENDING,
         type: EventTypesEnum["Gole Powyżej/Poniżej"],
         name: `Under ${threshold}`,
         value: underKey,

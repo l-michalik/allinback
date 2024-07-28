@@ -101,12 +101,12 @@ export const runBacktest = async () => {
 
           switch (eventType) {
             case EventTypesEnum["Wynik meczu (z wyłączeniem dogrywki)"]:
-              likelyTypes.push(...calculateMatchResultPercentages(
-                fixture.id,
-                analyzedFixtures,
-                homeTeam,
-                awayTeam
-              ));
+              // likelyTypes.push(...calculateMatchResultPercentages(
+              //   fixture.id,
+              //   analyzedFixtures,
+              //   homeTeam,
+              //   awayTeam
+              // ));
               break;
             case EventTypesEnum["Podwójna szansa"]:
               // likelyTypes.push(...calculateDoubleChancePercentages(
