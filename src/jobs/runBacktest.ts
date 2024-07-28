@@ -13,11 +13,10 @@ import { EventTypes, EventTypesEnum } from "../constants";
 import dbConnect from "../lib/dbConnect";
 import { Fixture } from "../models";
 import { exit } from "process";
+import { ILikelyType } from "../types";
 
 export const runBacktest = async () => {
   console.log("Running backtest...");
-
-  // analyze efficiency by the time period and number of fixtures
 
   try {
     await dbConnect();
@@ -31,6 +30,8 @@ export const runBacktest = async () => {
       .populate(["statistic", "league", "teams.home", "teams.away"])
       .sort({ timestamp: -1 })
       .limit(50);
+
+    const likelyTypes: ILikelyType[] = [];
 
     let startDate: any = new Date(start.timestamp * 1000);
     startDate.setHours(0, 0, 0, 0);
@@ -100,57 +101,70 @@ export const runBacktest = async () => {
 
           switch (eventType) {
             case EventTypesEnum["Wynik meczu (z wyłączeniem dogrywki)"]:
-              calculateMatchResultPercentages(
+              likelyTypes.push(...calculateMatchResultPercentages(
+                fixture.id,
                 analyzedFixtures,
                 homeTeam,
                 awayTeam
-              );
+              ));
               break;
             case EventTypesEnum["Podwójna szansa"]:
-              calculateDoubleChancePercentages(
-                analyzedFixtures,
-                homeTeam,
-                awayTeam
-              );
+              // likelyTypes.push(...calculateDoubleChancePercentages(
+              //   fixture.id,
+              //   analyzedFixtures,
+              //   homeTeam,
+              //   awayTeam
+              // ));
               break;
             case EventTypesEnum["Gole Powyżej/Poniżej"]:
-              calculateOverUnderPercentages(analyzedFixtures);
+              // likelyTypes.push(...calculateOverUnderPercentages(
+              //   fixture.id,
+              //   analyzedFixtures
+              // ));
               break;
             case EventTypesEnum["Oba zespoły strzelą gola"]:
-              calculateBTTSPercentages(analyzedFixtures);
+              // calculateBTTSPercentages(analyzedFixtures);
               break;
             case EventTypesEnum["Gole gospodarzy powyżej/poniżej"]:
-              calculateTeamOverUnderPercentages(
-                analyzedFixtures,
-                fixture.teams.home.id
-              );
+              // calculateTeamOverUnderPercentages(
+              //   analyzedFixtures,
+              //   fixture.teams.home.id
+              // );
               break;
             case EventTypesEnum["Gole gości powyżej/poniżej"]:
-              calculateTeamOverUnderPercentages(
-                analyzedFixtures,
-                fixture.teams.away.id
-              );
+              // calculateTeamOverUnderPercentages(
+              //   analyzedFixtures,
+              //   fixture.teams.away.id
+              // );
               break;
             case EventTypesEnum["Handicap"]:
-              calculateHandicapPercentages(
-                analyzedFixtures,
-                homeTeam,
-                awayTeam
-              );
+              // calculateHandicapPercentages(
+              //   analyzedFixtures,
+              //   homeTeam,
+              //   awayTeam
+              // );
               break;
             case EventTypesEnum["Wynik 1. połowy"]:
-              calculateFirstHalfResultPercentages(
-                analyzedFixtures,
-                homeTeam,
-                awayTeam
-              );
+              // calculateFirstHalfResultPercentages(
+              //   analyzedFixtures,
+              //   homeTeam,
+              //   awayTeam
+              // );
               break;
             case EventTypesEnum["1. połowa, gole powyżej/poniżej"]:
-              calculateFirstHalfOverUnderPercentages(analyzedFixtures);
+              // calculateFirstHalfOverUnderPercentages(analyzedFixtures);
               break;
           }
         });
       });
+    }
+
+    console.log("###########################################");
+
+    if (likelyTypes.length === 0) {
+      console.log("No likely types found.");
+    } else {
+      console.log(`Likely types: ${likelyTypes.length}`);
     }
   } catch (error) {
     console.log("Error:", error);
