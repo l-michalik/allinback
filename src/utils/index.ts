@@ -31,3 +31,7 @@ export function formatDate(dateString: string): string {
 export function padStringWithSpaces(str: string, targetLength: number): string {
   return str.padEnd(targetLength, ' ');
 }
+
+export function getPercentage(value: number, total: number): number {
+  return (value / total) * 100;
+}

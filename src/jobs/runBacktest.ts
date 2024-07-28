@@ -1,10 +1,23 @@
-import { exit } from "process";
-import dbConnect from "../lib/dbConnect";
-import { Fixture } from "../models/Fixtures";
+import {
+  calculateTeamOverUnderPercentages,
+  calculateBTTSPercentages,
+  calculateDoubleChancePercentages,
+  calculateMatchResultPercentages,
+  calculateOverUnderPercentages,
+  calculateFirstHalfOverUnderPercentages,
+  calculateFirstHalfResultPercentages,
+  calculateHandicapPercentages,
+} from "../utils/calculation";
 import { formatDate, padStringWithSpaces } from "../utils";
+import { EventTypes, EventTypesEnum } from "../constants";
+import dbConnect from "../lib/dbConnect";
+import { Fixture } from "../models";
+import { exit } from "process";
 
 export const runBacktest = async () => {
   console.log("Running backtest...");
+
+  // analyze efficiency by the time period and number of fixtures
 
   try {
     await dbConnect();
@@ -14,7 +27,10 @@ export const runBacktest = async () => {
       Fixture.findOne({}).sort({ timestamp: -1 }),
     ]);
 
-    const fixtures = await Fixture.find({});
+    const fixtures = await Fixture.find({})
+      .populate(["statistic", "league", "teams.home", "teams.away"])
+      .sort({ timestamp: -1 })
+      .limit(50);
 
     let startDate: any = new Date(start.timestamp * 1000);
     startDate.setHours(0, 0, 0, 0);
@@ -34,18 +50,107 @@ export const runBacktest = async () => {
           fixture.timestamp < nextDayDate.getTime() / 1000
       );
 
+      startDate = nextDayDate;
+      nextDayDate = new Date(nextDayDate.getTime() + 86400000);
+
+      if (fixturesForDate.length === 0) {
+        continue;
+      }
+
       console.log(
-        `${padStringWithSpaces(fixturesDate, 25)} | (${
+        `${padStringWithSpaces(fixturesDate, 27)} | (${
           fixturesForDate.length
         }) fixtures`
       );
 
-      fixturesForDate.forEach((fixture) => {
-        console.log(fixture);
-      });
+      fixturesForDate.forEach(async (fixture) => {
+        console.log(
+          `- ${padStringWithSpaces(
+            fixture.league.name,
+            25
+          )} | ${padStringWithSpaces(
+            `${fixture.teams.home.name} vs ${fixture.teams.away.name}`,
+            45
+          )} | ${new Date(fixture.timestamp * 1000).toLocaleString()}`
+        );
 
-      startDate = nextDayDate;
-      nextDayDate = new Date(nextDayDate.getTime() + 86400000);
+        const analyzedFixtures = fixtures
+          .filter(
+            (f) =>
+              (f.teams.home._id === fixture.teams.home._id ||
+                f.teams.away._id === fixture.teams.home._id ||
+                f.teams.home._id === fixture.teams.away._id ||
+                f.teams.away._id === fixture.teams.away._id) &&
+              f.timestamp < fixture.timestamp
+          )
+          .slice(-1);
+
+        console.log("-- Available fixtures:", analyzedFixtures.length);
+
+        if (analyzedFixtures.length === 0) {
+          console.log("-- No fixtures to analyze. Skipping...");
+          return;
+        }
+
+        const homeTeam = fixture.teams.home.name;
+        const awayTeam = fixture.teams.away.name;
+
+        EventTypes.forEach((eventType, idx) => {
+          console.log(`--- (${idx + 1}). ${eventType}`);
+
+          switch (eventType) {
+            case EventTypesEnum["Wynik meczu (z wyłączeniem dogrywki)"]:
+              calculateMatchResultPercentages(
+                analyzedFixtures,
+                homeTeam,
+                awayTeam
+              );
+              break;
+            case EventTypesEnum["Podwójna szansa"]:
+              calculateDoubleChancePercentages(
+                analyzedFixtures,
+                homeTeam,
+                awayTeam
+              );
+              break;
+            case EventTypesEnum["Gole Powyżej/Poniżej"]:
+              calculateOverUnderPercentages(analyzedFixtures);
+              break;
+            case EventTypesEnum["Oba zespoły strzelą gola"]:
+              calculateBTTSPercentages(analyzedFixtures);
+              break;
+            case EventTypesEnum["Gole gospodarzy powyżej/poniżej"]:
+              calculateTeamOverUnderPercentages(
+                analyzedFixtures,
+                fixture.teams.home.id
+              );
+              break;
+            case EventTypesEnum["Gole gości powyżej/poniżej"]:
+              calculateTeamOverUnderPercentages(
+                analyzedFixtures,
+                fixture.teams.away.id
+              );
+              break;
+            case EventTypesEnum["Handicap"]:
+              calculateHandicapPercentages(
+                analyzedFixtures,
+                homeTeam,
+                awayTeam
+              );
+              break;
+            case EventTypesEnum["Wynik 1. połowy"]:
+              calculateFirstHalfResultPercentages(
+                analyzedFixtures,
+                homeTeam,
+                awayTeam
+              );
+              break;
+            case EventTypesEnum["1. połowa, gole powyżej/poniżej"]:
+              calculateFirstHalfOverUnderPercentages(analyzedFixtures);
+              break;
+          }
+        });
+      });
     }
   } catch (error) {
     console.log("Error:", error);
