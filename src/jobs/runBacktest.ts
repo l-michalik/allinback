@@ -101,29 +101,32 @@ export const runBacktest = async () => {
 
           switch (eventType) {
             case EventTypesEnum["Wynik meczu (z wyłączeniem dogrywki)"]:
-              // likelyTypes.push(...calculateMatchResultPercentages(
-              //   fixture.id,
-              //   analyzedFixtures,
-              //   homeTeam,
-              //   awayTeam
-              // ));
+              likelyTypes.push(...calculateMatchResultPercentages(
+                fixture.id,
+                analyzedFixtures,
+                homeTeam,
+                awayTeam
+              ));
               break;
             case EventTypesEnum["Podwójna szansa"]:
-              // likelyTypes.push(...calculateDoubleChancePercentages(
-              //   fixture.id,
-              //   analyzedFixtures,
-              //   homeTeam,
-              //   awayTeam
-              // ));
+              likelyTypes.push(...calculateDoubleChancePercentages(
+                fixture.id,
+                analyzedFixtures,
+                homeTeam,
+                awayTeam
+              ));
               break;
             case EventTypesEnum["Gole Powyżej/Poniżej"]:
-              // likelyTypes.push(...calculateOverUnderPercentages(
-              //   fixture.id,
-              //   analyzedFixtures
-              // ));
+              likelyTypes.push(...calculateOverUnderPercentages(
+                fixture.id,
+                analyzedFixtures
+              ));
               break;
             case EventTypesEnum["Oba zespoły strzelą gola"]:
-              // calculateBTTSPercentages(analyzedFixtures);
+              likelyTypes.push(...calculateBTTSPercentages(
+                fixture.id,
+                analyzedFixtures
+              ));
               break;
             case EventTypesEnum["Gole gospodarzy powyżej/poniżej"]:
               // calculateTeamOverUnderPercentages(

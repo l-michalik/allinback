@@ -10,78 +10,40 @@ export function calculateMatchResultPercentages(
 ) {
   const result: ILikelyType[] = [];
 
-  const homeWinPercentage = calculatePercentage(
-    analyzedFixtures,
-    (f) => f.statistic.score.fulltime.home > f.statistic.score.fulltime.away
+  const calculatePercentageAndPush = (
+    condition: (f: any) => boolean,
+    team: string
+  ) => {
+    const percentage = calculatePercentage(analyzedFixtures, condition);
+    console.log(`---- ${team} : ${percentage.toFixed(2)}%`);
+    if (percentage >= 75) {
+      result.push({
+        fixtureId,
+        status: EventStatusEnum.PENDING,
+        probability: percentage,
+        type: EventTypesEnum["Wynik meczu (z wyłączeniem dogrywki)"],
+        name: team,
+      });
+    }
+  };
+
+  calculatePercentageAndPush(
+    (f) => f.statistic.score.fulltime.home > f.statistic.score.fulltime.away,
+    homeTeam
   );
 
-  console.log(`---- ${homeTeam} : ${homeWinPercentage.toFixed(2)}%`);
-
-  if (homeWinPercentage >= 75) {
-    result.push({
-      fixtureId,
-      status: EventStatusEnum.PENDING,
-      type: EventTypesEnum["Wynik meczu (z wyłączeniem dogrywki)"],
-      name: `${homeTeam}`,
-      value: "WIN",
-    });
-  }
-
-  const drawPercentage = calculatePercentage(
-    analyzedFixtures,
-    (f) => f.statistic.score.fulltime.home === f.statistic.score.fulltime.away
-  );
-  console.log(`---- Remis : ${drawPercentage.toFixed(2)}%`);
-
-  if (drawPercentage >= 75) {
-    result.push({
-      fixtureId,
-      status: EventStatusEnum.PENDING,
-      type: EventTypesEnum["Wynik meczu (z wyłączeniem dogrywki)"],
-      name: "Remis",
-      value: "Remis",
-    });
-  }
-
-  const awayWinPercentage = calculatePercentage(
-    analyzedFixtures,
-    (f) => f.statistic.score.fulltime.home < f.statistic.score.fulltime.away
+  calculatePercentageAndPush(
+    (f) => f.statistic.score.fulltime.home === f.statistic.score.fulltime.away,
+    "Remis"
   );
 
-  console.log(`---- ${awayTeam} : ${awayWinPercentage.toFixed(2)}%`);
-
-  if (awayWinPercentage >= 75) {
-    result.push({
-      fixtureId,
-      status: EventStatusEnum.PENDING,
-      type: EventTypesEnum["Wynik meczu (z wyłączeniem dogrywki)"],
-      name: `${awayTeam}`,
-      value: `WIN`,
-    });
-  }
-
-  console.log(result);
+  calculatePercentageAndPush(
+    (f) => f.statistic.score.fulltime.home < f.statistic.score.fulltime.away,
+    awayTeam
+  );
 
   return result;
 }
-
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
 
 export function calculateDoubleChancePercentages(
   fixtureId: number,
@@ -91,140 +53,139 @@ export function calculateDoubleChancePercentages(
 ) {
   const result: ILikelyType[] = [];
 
-  const homeWinOrDrawPercentage = calculatePercentage(
-    analyzedFixtures,
-    (f) => f.statistic.score.fulltime.home >= f.statistic.score.fulltime.away
+  const calculateAndPush = (condition: (f: any) => boolean, name: string) => {
+    const percentage = calculatePercentage(analyzedFixtures, condition);
+    console.log(`---- ${name} : ${percentage.toFixed(2)}%`);
+    if (percentage >= 75) {
+      result.push({
+        fixtureId,
+        status: EventStatusEnum.PENDING,
+        probability: percentage,
+        type: EventTypesEnum["Podwójna szansa"],
+        name,
+      });
+    }
+  };
+
+  calculateAndPush(
+    (f) => f.statistic.score.fulltime.home >= f.statistic.score.fulltime.away,
+    `${homeTeam} lub Remis`
   );
 
-  console.log(
-    `---- ${homeTeam} or Draw : ${homeWinOrDrawPercentage.toFixed(2)}%`
+  calculateAndPush(
+    (f) => f.statistic.score.fulltime.home !== f.statistic.score.fulltime.away,
+    `${homeTeam} lub ${awayTeam}`
   );
 
-  if (homeWinOrDrawPercentage >= 75) {
-    result.push({
-      fixtureId,
-      status: EventStatusEnum.PENDING,
-      type: EventTypesEnum["Podwójna szansa"],
-      name: `${homeTeam} or Draw`,
-      value: "HOME_OR_DRAW",
-    });
-  }
-
-  const homeWinOrAwayPercentage = calculatePercentage(
-    analyzedFixtures,
-    (f) => f.statistic.score.fulltime.home !== f.statistic.score.fulltime.away
+  calculateAndPush(
+    (f) => f.statistic.score.fulltime.home <= f.statistic.score.fulltime.away,
+    `${awayTeam} lub Remis`
   );
-
-  console.log(
-    `---- ${homeTeam} or ${awayTeam} : ${homeWinOrAwayPercentage.toFixed(2)}%`
-  );
-
-  if (homeWinOrAwayPercentage >= 75) {
-    result.push({
-      fixtureId,
-      status: EventStatusEnum.PENDING,
-      type: EventTypesEnum["Podwójna szansa"],
-      name: `${homeTeam} or ${awayTeam}`,
-      value: "HOME_OR_AWAY",
-    });
-  }
-
-  const awayWinOrDrawPercentage = calculatePercentage(
-    analyzedFixtures,
-    (f) => f.statistic.score.fulltime.home <= f.statistic.score.fulltime.away
-  );
-
-  console.log(
-    `---- ${awayTeam} or Draw : ${awayWinOrDrawPercentage.toFixed(2)}%`
-  );
-
-  if (awayWinOrDrawPercentage >= 75) {
-    result.push({
-      fixtureId,
-      status: EventStatusEnum.PENDING,
-      type: EventTypesEnum["Podwójna szansa"],
-      name: `${awayTeam} or Draw`,
-      value: "AWAY_OR_DRAW",
-    });
-  }
 
   return result;
 }
 
-// 
-
 export function calculateOverUnderPercentages(
   fixtureId: number,
-  analyzedFixtures: any[]) {
+  analyzedFixtures: any[]
+) {
   const result: ILikelyType[] = [];
 
   const thresholds = [0.5, 1.5, 2.5, 3.5];
 
   thresholds.forEach((threshold) => {
-    const overKey = `over${threshold.toString().replace(".", "")}`;
-    const underKey = `under${threshold.toString().replace(".", "")}`;
-
     const overPercentage = calculatePercentage(
       analyzedFixtures,
       (f) =>
-        f.statistic.score.fulltime.home + f.statistic.score.fulltime.away > threshold
+        f.statistic.score.fulltime.home + f.statistic.score.fulltime.away >
+        threshold
     );
 
-    console.log(`---- Over ${threshold}: ${overPercentage.toFixed(2)}%`);
+    console.log(`---- Powyżej ${threshold}: ${overPercentage.toFixed(2)}%`);
 
     if (overPercentage >= 75) {
       result.push({
         fixtureId,
         status: EventStatusEnum.PENDING,
+        probability: overPercentage,
         type: EventTypesEnum["Gole Powyżej/Poniżej"],
-        name: `Over ${threshold}`,
-        value: overKey,
+        name: `Powyżej ${threshold}`,
       });
     }
 
     const underPercentage = calculatePercentage(
       analyzedFixtures,
       (f) =>
-        f.statistic.score.fulltime.home + f.statistic.score.fulltime.away < threshold
+        f.statistic.score.fulltime.home + f.statistic.score.fulltime.away <
+        threshold
     );
 
-    console.log(`---- Under ${threshold}: ${underPercentage.toFixed(2)}%`);
+    console.log(`---- Poniżej ${threshold}: ${underPercentage.toFixed(2)}%`);
 
     if (underPercentage >= 75) {
       result.push({
         fixtureId,
         status: EventStatusEnum.PENDING,
+        probability: underPercentage,
         type: EventTypesEnum["Gole Powyżej/Poniżej"],
-        name: `Under ${threshold}`,
-        value: underKey,
+        name: `Poniżej ${threshold}`,
       });
     }
   });
 
-  console.log(result);
-  
+  return result;
+}
+
+export function calculateBTTSPercentages(
+  fixtureId: number,
+  analyzedFixtures: any[]
+) {
+  const result: ILikelyType[] = [];
+
+  const calculateAndPush = (condition: (f: any) => boolean, name: string) => {
+    const percentage = calculatePercentage(analyzedFixtures, condition);
+    console.log(`---- ${name}: ${percentage.toFixed(2)}%`);
+    if (percentage >= 75) {
+      result.push({
+        fixtureId,
+        status: EventStatusEnum.PENDING,
+        probability: percentage,
+        type: EventTypesEnum["Oba zespoły strzelą gola"],
+        name,
+      });
+    }
+  };
+
+  calculateAndPush(
+    (f) => f.statistic.score.fulltime.home > 0 && f.statistic.score.fulltime.away > 0,
+    "Tak"
+  );
+
+  calculateAndPush(
+    (f) => f.statistic.score.fulltime.home === 0 || f.statistic.score.fulltime.away === 0,
+    "Nie"
+  );
 
   return result;
 }
 
-export function calculateBTTSPercentages(analyzedFixtures: any[]) {
-  console.log(
-    `---- Tak: ${calculatePercentage(
-      analyzedFixtures,
-      (f) =>
-        f.statistic.score.fulltime.home > 0 &&
-        f.statistic.score.fulltime.away > 0
-    ).toFixed(2)}%`
-  );
-  console.log(
-    `---- Nie: ${calculatePercentage(
-      analyzedFixtures,
-      (f) =>
-        f.statistic.score.fulltime.home === 0 ||
-        f.statistic.score.fulltime.away === 0
-    ).toFixed(2)}%`
-  );
-}
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
+// ##############################################
 
 export function calculateTeamOverUnderPercentages(
   analyzedFixtures: any[],

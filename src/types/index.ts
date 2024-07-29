@@ -14,7 +14,7 @@ export const enum EventStatusEnum {
 export interface ILikelyType {
   fixtureId: number;
   status: EventStatusEnum;
+  probability: number;
   type: EventTypesEnum;
   name: string;
-  value: string | number;
 }
