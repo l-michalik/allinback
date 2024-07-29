@@ -169,28 +169,13 @@ export function calculateBTTSPercentages(
   return result;
 }
 
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-// ##############################################
-
 export function calculateTeamOverUnderPercentages(
+  fixtureId: number,
+  eventTypesEnum: EventTypesEnum,
   analyzedFixtures: any[],
   teamId: number
 ) {
+  const result: ILikelyType[] = [];
   const thresholds = [0.5, 1.5, 2.5, 3.5];
 
   const fixturesForTeam = analyzedFixtures.filter(
@@ -199,127 +184,180 @@ export function calculateTeamOverUnderPercentages(
 
   if (fixturesForTeam.length === 0) {
     console.log(`---- Brak meczów dla drużyny o id ${teamId}`);
-    return;
+    return [];
   }
 
   thresholds.forEach((threshold) => {
-    const overKey = `homeOver${threshold.toString().replace(".", "")}`;
-    const underKey = `homeUnder${threshold.toString().replace(".", "")}`;
+    const overPercentage = calculatePercentage(
+      fixturesForTeam,
+      (f) =>
+        (f.statistic.score.fulltime.home > threshold && f.teams.home.id === teamId) ||
+        (f.statistic.score.fulltime.away > threshold && f.teams.away.id === teamId)
+    );
 
-    console.log(
-      `---- Powyżej ${threshold}: ${calculatePercentage(
-        fixturesForTeam,
-        (f) =>
-          (f.statistic.score.fulltime.home > threshold &&
-            f.teams.home.id === teamId) ||
-          (f.statistic.score.fulltime.away > threshold &&
-            f.teams.away.id === teamId)
-      ).toFixed(2)}%`
+    console.log(`---- Powyżej ${threshold}: ${overPercentage.toFixed(2)}%`);
+
+    if (overPercentage >= 75) {
+      result.push({
+        fixtureId,
+        status: EventStatusEnum.PENDING,
+        probability: overPercentage,
+        type: eventTypesEnum,
+        name: `Powyżej ${threshold}`,
+      });
+    }
+
+    const underPercentage = calculatePercentage(
+      fixturesForTeam,
+      (f) =>
+        (f.statistic.score.fulltime.home < threshold && f.teams.home.id === teamId) ||
+        (f.statistic.score.fulltime.away < threshold && f.teams.away.id === teamId)
     );
-    console.log(
-      `---- Poniżej ${threshold}: ${calculatePercentage(
-        fixturesForTeam,
-        (f) =>
-          (f.statistic.score.fulltime.home < threshold &&
-            f.teams.home.id === teamId) ||
-          (f.statistic.score.fulltime.away < threshold &&
-            f.teams.away.id === teamId)
-      ).toFixed(2)}%`
-    );
+
+    console.log(`---- Poniżej ${threshold}: ${underPercentage.toFixed(2)}%`);
+
+    if (underPercentage >= 75) {
+      result.push({
+        fixtureId,
+        status: EventStatusEnum.PENDING,
+        probability: underPercentage,
+        type: eventTypesEnum,
+        name: `Poniżej ${threshold}`,
+      });
+    }
   });
+
+  return result;
 }
 
 export function calculateHandicapPercentages(
+  fixtureId: number,
   analyzedFixtures: any[],
   homeTeam: string,
   awayTeam: string
 ): any {
+  const result: ILikelyType[] = [];
   const thresholds = [1, 2];
 
   thresholds.forEach((threshold) => {
-    console.log(
-      `---- ${homeTeam} -${threshold}: ${calculatePercentage(
-        analyzedFixtures,
-        (f) =>
-          f.statistic.score.fulltime.home - threshold >
-          f.statistic.score.fulltime.away
-      ).toFixed(2)}%`
-    );
-    console.log(
-      `---- ${awayTeam} -${threshold}: ${calculatePercentage(
-        analyzedFixtures,
-        (f) =>
-          f.statistic.score.fulltime.away - threshold >
-          f.statistic.score.fulltime.home
-      ).toFixed(2)}%`
-    );
-    console.log(
-      `---- ${homeTeam} +${threshold}: ${calculatePercentage(
-        analyzedFixtures,
-        (f) =>
-          f.statistic.score.fulltime.home + threshold >
-          f.statistic.score.fulltime.away
-      ).toFixed(2)}%`
-    );
-    console.log(
-      `---- ${awayTeam} +${threshold}: ${calculatePercentage(
-        analyzedFixtures,
-        (f) =>
-          f.statistic.score.fulltime.away + threshold >
-          f.statistic.score.fulltime.home
-      ).toFixed(2)}%`
-    );
+    const conditions = [
+      (f:any) => f.statistic.score.fulltime.home - threshold > f.statistic.score.fulltime.away,
+      (f:any) => f.statistic.score.fulltime.away - threshold > f.statistic.score.fulltime.home,
+      (f:any) => f.statistic.score.fulltime.home + threshold > f.statistic.score.fulltime.away,
+      (f:any) => f.statistic.score.fulltime.away + threshold > f.statistic.score.fulltime.home
+    ];
+
+    const names = [
+      `${homeTeam} -${threshold}`,
+      `${awayTeam} -${threshold}`,
+      `${homeTeam} +${threshold}`,
+      `${awayTeam} +${threshold}`
+    ];
+
+    conditions.forEach((condition, index) => {
+      const percentage = calculatePercentage(analyzedFixtures, condition);
+      console.log(`---- ${names[index]}: ${percentage.toFixed(2)}%`);
+      if (percentage >= 75) {
+        result.push({
+          fixtureId,
+          status: EventStatusEnum.PENDING,
+          probability: percentage,
+          type: EventTypesEnum["Handicap"],
+          name: names[index],
+        });
+      }
+    });
   });
+  
+  return result;
 }
 
 export function calculateFirstHalfResultPercentages(
+  fixtureId: number,
   analyzedFixtures: any[],
   homeTeam: string,
   awayTeam: string
 ) {
-  console.log(
-    `---- ${homeTeam} : ${calculatePercentage(
-      analyzedFixtures,
-      (f) => f.statistic.score.halftime.home > f.statistic.score.halftime.away
-    ).toFixed(2)}%`
+  const result: ILikelyType[] = [];
+
+  const calculateAndPush = (condition: (f: any) => boolean, name: string) => {
+    const percentage = calculatePercentage(analyzedFixtures, condition);
+    console.log(`---- ${name} : ${percentage.toFixed(2)}%`);
+    if (percentage >= 75) {
+      result.push({
+        fixtureId,
+        status: EventStatusEnum.PENDING,
+        probability: percentage,
+        type: EventTypesEnum["Wynik 1. połowy"],
+        name,
+      });
+    }
+  };
+
+  calculateAndPush(
+    (f) => f.statistic.score.halftime.home > f.statistic.score.halftime.away,
+    homeTeam
   );
-  console.log(
-    `---- Remis : ${calculatePercentage(
-      analyzedFixtures,
-      (f) => f.statistic.score.halftime.home === f.statistic.score.halftime.away
-    ).toFixed(2)}%`
+
+  calculateAndPush(
+    (f) => f.statistic.score.halftime.home === f.statistic.score.halftime.away,
+    "Remis"
   );
-  console.log(
-    `---- ${awayTeam} : ${calculatePercentage(
-      analyzedFixtures,
-      (f) => f.statistic.score.halftime.home < f.statistic.score.halftime.away
-    ).toFixed(2)}%`
+
+  calculateAndPush(
+    (f) => f.statistic.score.halftime.home < f.statistic.score.halftime.away,
+    awayTeam
   );
+
+  return result;
 }
 
 export function calculateFirstHalfOverUnderPercentages(
+  fixtureId: number,
   analyzedFixtures: any[]
 ) {
+  const result: ILikelyType[] = [];
   const thresholds = [0.5, 1.5, 2.5];
 
   thresholds.forEach((threshold) => {
-    console.log(
-      `---- Powyżej ${threshold}: ${calculatePercentage(
-        analyzedFixtures,
-        (f) =>
-          f.statistic.score.halftime.home + f.statistic.score.halftime.away >
-          threshold
-      ).toFixed(2)}%`
+    const overPercentage = calculatePercentage(
+      analyzedFixtures,
+      (f) =>
+        f.statistic.score.halftime.home + f.statistic.score.halftime.away > threshold
     );
-    console.log(
-      `---- Poniżej ${threshold}: ${calculatePercentage(
-        analyzedFixtures,
-        (f) =>
-          f.statistic.score.halftime.home + f.statistic.score.halftime.away <
-          threshold
-      ).toFixed(2)}%`
+
+    console.log(`---- Powyżej ${threshold}: ${overPercentage.toFixed(2)}%`);
+
+    if (overPercentage >= 75) {
+      result.push({
+        fixtureId,
+        status: EventStatusEnum.PENDING,
+        probability: overPercentage,
+        type: EventTypesEnum["1. połowa, gole powyżej/poniżej"],
+        name: `Powyżej ${threshold}`,
+      });
+    }
+
+    const underPercentage = calculatePercentage(
+      analyzedFixtures,
+      (f) =>
+        f.statistic.score.halftime.home + f.statistic.score.halftime.away < threshold
     );
+
+    console.log(`---- Poniżej ${threshold}: ${underPercentage.toFixed(2)}%`);
+
+    if (underPercentage >= 75) {
+      result.push({
+        fixtureId,
+        status: EventStatusEnum.PENDING,
+        probability: underPercentage,
+        type: EventTypesEnum["1. połowa, gole powyżej/poniżej"],
+        name: `Poniżej ${threshold}`,
+      });
+    }
   });
+
+  return result;
 }
 
 function calculatePercentage(

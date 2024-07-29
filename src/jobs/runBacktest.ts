@@ -129,33 +129,42 @@ export const runBacktest = async () => {
               ));
               break;
             case EventTypesEnum["Gole gospodarzy powyżej/poniżej"]:
-              // calculateTeamOverUnderPercentages(
-              //   analyzedFixtures,
-              //   fixture.teams.home.id
-              // );
+              likelyTypes.push(...calculateTeamOverUnderPercentages(
+                fixture.id,
+                EventTypesEnum["Gole gospodarzy powyżej/poniżej"],
+                analyzedFixtures,
+                fixture.teams.home.id
+              ));
               break;
             case EventTypesEnum["Gole gości powyżej/poniżej"]:
-              // calculateTeamOverUnderPercentages(
-              //   analyzedFixtures,
-              //   fixture.teams.away.id
-              // );
+              likelyTypes.push(...calculateTeamOverUnderPercentages(
+                  fixture.id,
+                  EventTypesEnum["Gole gości powyżej/poniżej"],
+                  analyzedFixtures,
+                  fixture.teams.away.id
+                ));
               break;
             case EventTypesEnum["Handicap"]:
-              // calculateHandicapPercentages(
-              //   analyzedFixtures,
-              //   homeTeam,
-              //   awayTeam
-              // );
+              likelyTypes.push(...calculateHandicapPercentages(
+                fixture.id,
+                analyzedFixtures,
+                homeTeam,
+                awayTeam
+              ));
               break;
             case EventTypesEnum["Wynik 1. połowy"]:
-              // calculateFirstHalfResultPercentages(
-              //   analyzedFixtures,
-              //   homeTeam,
-              //   awayTeam
-              // );
+              likelyTypes.push(...calculateFirstHalfResultPercentages(
+                fixture.id,
+                analyzedFixtures,
+                homeTeam,
+                awayTeam
+              ));
               break;
             case EventTypesEnum["1. połowa, gole powyżej/poniżej"]:
-              // calculateFirstHalfOverUnderPercentages(analyzedFixtures);
+              likelyTypes.push(...calculateFirstHalfOverUnderPercentages(
+                fixture.id,
+                analyzedFixtures
+              ));
               break;
           }
         });
