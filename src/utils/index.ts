@@ -1,4 +1,4 @@
-import { IOptions } from "../types";
+import { ILikelyType, IOptions } from "../types";
 
 export const createOptions = ({ params, path }: IOptions) => {
   return {
@@ -34,4 +34,14 @@ export function padStringWithSpaces(str: string, targetLength: number): string {
 
 export function getPercentage(value: number, total: number): number {
   return (value / total) * 100;
+}
+
+export function groupByFixtureId(elements: ILikelyType[]): Record<number, ILikelyType[]> {
+  return elements.reduce((accumulator, current) => {
+    if (!accumulator[current.fixtureId]) {
+      accumulator[current.fixtureId] = [];
+    }
+    accumulator[current.fixtureId].push(current);
+    return accumulator;
+  }, {} as Record<number, ILikelyType[]>);
 }

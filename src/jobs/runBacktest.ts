@@ -8,15 +8,18 @@ import {
   calculateFirstHalfResultPercentages,
   calculateHandicapPercentages,
 } from "../utils/calculation";
-import { formatDate, padStringWithSpaces } from "../utils";
+import { formatDate, groupByFixtureId, padStringWithSpaces } from "../utils";
 import { EventTypes, EventTypesEnum } from "../constants";
 import dbConnect from "../lib/dbConnect";
 import { Fixture } from "../models";
 import { exit } from "process";
-import { ILikelyType } from "../types";
+import { EventStatusEnum, ILikelyType } from "../types";
 
 export const runBacktest = async () => {
   console.log("Running backtest...");
+
+  const likelyTypes: ILikelyType[] = [];
+  let fixtures: any[] = [];
 
   try {
     await dbConnect();
@@ -26,12 +29,10 @@ export const runBacktest = async () => {
       Fixture.findOne({}).sort({ timestamp: -1 }),
     ]);
 
-    const fixtures = await Fixture.find({})
+    fixtures = await Fixture.find({})
       .populate(["statistic", "league", "teams.home", "teams.away"])
       .sort({ timestamp: -1 })
       .limit(50);
-
-    const likelyTypes: ILikelyType[] = [];
 
     let startDate: any = new Date(start.timestamp * 1000);
     startDate.setHours(0, 0, 0, 0);
@@ -59,8 +60,7 @@ export const runBacktest = async () => {
       }
 
       console.log(
-        `${padStringWithSpaces(fixturesDate, 27)} | (${
-          fixturesForDate.length
+        `${padStringWithSpaces(fixturesDate, 27)} | (${fixturesForDate.length
         }) fixtures`
       );
 
@@ -138,11 +138,11 @@ export const runBacktest = async () => {
               break;
             case EventTypesEnum["Gole gości powyżej/poniżej"]:
               likelyTypes.push(...calculateTeamOverUnderPercentages(
-                  fixture.id,
-                  EventTypesEnum["Gole gości powyżej/poniżej"],
-                  analyzedFixtures,
-                  fixture.teams.away.id
-                ));
+                fixture.id,
+                EventTypesEnum["Gole gości powyżej/poniżej"],
+                analyzedFixtures,
+                fixture.teams.away.id
+              ));
               break;
             case EventTypesEnum["Handicap"]:
               likelyTypes.push(...calculateHandicapPercentages(
@@ -171,17 +171,160 @@ export const runBacktest = async () => {
       });
     }
 
-    console.log("###########################################");
 
-    if (likelyTypes.length === 0) {
-      console.log("No likely types found.");
-    } else {
-      console.log(`Likely types: ${likelyTypes.length}`);
-    }
+    console.clear();
+
   } catch (error) {
     console.log("Error:", error);
   }
 
+  if (likelyTypes.length === 0) {
+    console.log("No likely types found.");
+    console.log("Backtest completed.");
+    exit();
+  }
+
+  console.log(`Likely types: ${likelyTypes.length}`);
+
+  const likelyTypesGrouped = groupByFixtureId(likelyTypes);
+
+  Object.keys(likelyTypesGrouped).forEach((fixtureId: any) => {
+    console.log(`- Fixture ID: ${fixtureId}`);
+
+    const fixtureToCheck = fixtures.find((f) => f.id === parseInt(fixtureId));
+
+    const score = fixtureToCheck.statistic.score;
+    let [uo, value]: any = [];
+    let w1, w2, w3, w4;
+
+    likelyTypesGrouped[fixtureId].forEach((item) => {
+      switch (item.type) {
+        case EventTypesEnum['1. połowa, gole powyżej/poniżej']:
+          const htGoals = score.halftime.home + score.halftime.away;
+
+          [uo, value] = item.name.split(' ');
+
+          if (uo === 'Powyżej' && htGoals > parseFloat(value) || uo === 'Poniżej' && htGoals < parseFloat(value)) {
+            item.status = EventStatusEnum.SUCCESS;
+          } else {
+            item.status = EventStatusEnum.FAILED
+          }
+
+          break;
+        case EventTypesEnum['Wynik meczu (z wyłączeniem dogrywki)']:
+          if ((item.name === 'Remis' && score.fulltime.home === score.fulltime.away)
+            || (item.name === fixtureToCheck.teams.home.name && score.fulltime.home > score.fulltime.away)
+            || (item.name === fixtureToCheck.teams.away.name && score.fulltime.away > score.fulltime.home)) {
+            item.status = EventStatusEnum.SUCCESS
+          } else {
+            item.status = EventStatusEnum.FAILED
+          }
+
+          break;
+        case EventTypesEnum['Wynik 1. połowy']:
+          if ((item.name === 'Remis' && score.halftime.home === score.halftime.away)
+            || (item.name === fixtureToCheck.teams.home.name && score.halftime.home > score.halftime.away)
+            || (item.name === fixtureToCheck.teams.away.name && score.halftime.away > score.halftime.home)
+          ) {
+            item.status = EventStatusEnum.SUCCESS
+          } else {
+            item.status = EventStatusEnum.FAILED
+          }
+
+          break;
+        case EventTypesEnum['Podwójna szansa']:
+          w1 = !item.name.includes('Remis') && score.fulltime.home !== score.fulltime.away;
+          w2 = item.name.includes(`${fixtureToCheck.teams.home.name} lub Remis`) && score.fulltime.home >= score.fulltime.away;
+          w3 = item.name.includes(`${fixtureToCheck.teams.away.name} lub Remis`) && score.fulltime.away >= score.fulltime.home;
+
+          if ((w1) || (w2) || (w3)) {
+            item.status = EventStatusEnum.SUCCESS
+          } else {
+            item.status = EventStatusEnum.FAILED
+          }
+
+          break;
+        case EventTypesEnum['Gole Powyżej/Poniżej']:
+          const ftGoals = score.fulltime.home + score.fulltime.away;
+
+          [uo, value] = item.name.split(' ');
+
+          if (uo === 'Powyżej' && ftGoals > parseFloat(value) || uo === 'Poniżej' && ftGoals < parseFloat(value)) {
+            item.status = EventStatusEnum.SUCCESS;
+          } else {
+            item.status = EventStatusEnum.FAILED
+          }
+          break;
+        case EventTypesEnum['Oba zespoły strzelą gola']:
+          w1 = item.name === 'Tak' && score.fulltime.home > 0 && score.fulltime.away > 0;
+          w2 = item.name === 'Nie' && (score.fulltime.home === 0 || score.fulltime.away === 0);
+
+          if (w1 || w2) {
+            item.status = EventStatusEnum.SUCCESS;
+          } else {
+            item.status = EventStatusEnum.FAILED;
+          }
+
+          break;
+        case EventTypesEnum['Gole gospodarzy powyżej/poniżej']:
+          const homeGoals = score.fulltime.home;
+
+          [uo, value] = item.name.split(' ');
+
+          if (uo === 'Powyżej' && homeGoals > parseFloat(value) || uo === 'Poniżej' && homeGoals < parseFloat(value)) {
+            item.status = EventStatusEnum.SUCCESS;
+          } else {
+            item.status = EventStatusEnum.FAILED
+          }
+
+          break;
+        case EventTypesEnum['Gole gości powyżej/poniżej']:
+          const awayGoals = score.fulltime.away;
+
+          [uo, value] = item.name.split(' ');
+
+          if (uo === 'Powyżej' && awayGoals > parseFloat(value) || uo === 'Poniżej' && awayGoals < parseFloat(value)) {
+            item.status = EventStatusEnum.SUCCESS;
+          } else {
+            item.status = EventStatusEnum.FAILED
+          }
+
+          break;
+        case EventTypesEnum['Handicap']:
+          const lastSpaceIndex = item.name.lastIndexOf(' ');
+
+          const team = item.name.substring(0, lastSpaceIndex);
+          const handicap = item.name.substring(lastSpaceIndex + 1);
+
+          const isMinus = handicap.includes('-');
+          value = parseFloat(handicap.replace('-', ''));
+
+          w1 = fixtureToCheck.teams.home.name === team && isMinus && score.fulltime.home - value > score.fulltime.away;
+          w2 = fixtureToCheck.teams.away.name === team && isMinus && score.fulltime.away - value > score.fulltime.home;
+          w3 = fixtureToCheck.teams.home.name === team && !isMinus && score.fulltime.home + value > score.fulltime.away;
+          w4 = fixtureToCheck.teams.away.name === team && !isMinus && score.fulltime.away + value > score.fulltime.home;
+
+          if (w1 || w2 || w3 || w4) {
+            item.status = EventStatusEnum.SUCCESS;
+          } else {
+            item.status = EventStatusEnum.FAILED;
+          }
+
+          break;
+        default:
+          console.log('UNHANDLED TYPE');
+          console.log(item);
+          break;
+      }
+    });
+  });
+
+  console.log('### SUMMARY ###');
+  console.log(`PENDING: ${likelyTypes.filter((lt) => lt.status === 'PENDING').length}`);
+  console.log(`SUCCESS: ${likelyTypes.filter((lt) => lt.status === 'SUCCESS').length}`);
+  console.log(`FAILED: ${likelyTypes.filter((lt) => lt.status === 'FAILED').length}`);
+  console.log(`SUCCESS RATE: ${((likelyTypes.filter((lt) => lt.status === 'SUCCESS').length / likelyTypes.length) * 100).toFixed(2)}%`);
+  
   console.log("Backtest completed.");
   exit();
 };
