@@ -43,6 +43,7 @@ export const createFixtures = async (year: number) => {
           response.data.response.map(async (doc: any) => {
             const fixture = doc.fixture;
             const score = doc.score;
+            const goals = doc.goals;
             const teams = doc.teams;
 
             const [_League, _Home, _Away, _Statistic] = await Promise.all([
@@ -51,14 +52,14 @@ export const createFixtures = async (year: number) => {
               Team.findOne({ id: teams.away.id }).select("_id"),
               Statistic.create({
                 id: fixture.id,
+                goals: {
+                  home: goals.home,
+                  away: goals.away,
+                },
                 score: {
                   halftime: {
                     home: score.halftime.home,
                     away: score.halftime.away,
-                  },
-                  fulltime: {
-                    home: score.fulltime.home,
-                    away: score.fulltime.away,
                   },
                 },
               }),

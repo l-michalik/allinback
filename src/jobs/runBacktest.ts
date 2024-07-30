@@ -171,9 +171,6 @@ export const runBacktest = async () => {
       });
     }
 
-
-    console.clear();
-
   } catch (error) {
     console.log("Error:", error);
   }
@@ -194,6 +191,7 @@ export const runBacktest = async () => {
     const fixtureToCheck = fixtures.find((f) => f.id === parseInt(fixtureId));
 
     const score = fixtureToCheck.statistic.score;
+    const goals = fixtureToCheck.statistic.goals;
     let [uo, value]: any = [];
     let w1, w2, w3, w4;
 
@@ -212,9 +210,9 @@ export const runBacktest = async () => {
 
           break;
         case EventTypesEnum['Wynik meczu (z wyłączeniem dogrywki)']:
-          if ((item.name === 'Remis' && score.fulltime.home === score.fulltime.away)
-            || (item.name === fixtureToCheck.teams.home.name && score.fulltime.home > score.fulltime.away)
-            || (item.name === fixtureToCheck.teams.away.name && score.fulltime.away > score.fulltime.home)) {
+          if ((item.name === 'Remis' && goals.home === goals.away)
+            || (item.name === fixtureToCheck.teams.home.name && goals.home > goals.away)
+            || (item.name === fixtureToCheck.teams.away.name && goals.away > goals.home)) {
             item.status = EventStatusEnum.SUCCESS
           } else {
             item.status = EventStatusEnum.FAILED
@@ -233,9 +231,9 @@ export const runBacktest = async () => {
 
           break;
         case EventTypesEnum['Podwójna szansa']:
-          w1 = !item.name.includes('Remis') && score.fulltime.home !== score.fulltime.away;
-          w2 = item.name.includes(`${fixtureToCheck.teams.home.name} lub Remis`) && score.fulltime.home >= score.fulltime.away;
-          w3 = item.name.includes(`${fixtureToCheck.teams.away.name} lub Remis`) && score.fulltime.away >= score.fulltime.home;
+          w1 = !item.name.includes('Remis') && goals.home !== goals.away;
+          w2 = item.name.includes(`${fixtureToCheck.teams.home.name} lub Remis`) && goals.home >= goals.away;
+          w3 = item.name.includes(`${fixtureToCheck.teams.away.name} lub Remis`) && goals.away >= goals.home;
 
           if ((w1) || (w2) || (w3)) {
             item.status = EventStatusEnum.SUCCESS
@@ -245,7 +243,7 @@ export const runBacktest = async () => {
 
           break;
         case EventTypesEnum['Gole Powyżej/Poniżej']:
-          const ftGoals = score.fulltime.home + score.fulltime.away;
+          const ftGoals = goals.home + goals.away;
 
           [uo, value] = item.name.split(' ');
 
@@ -256,8 +254,8 @@ export const runBacktest = async () => {
           }
           break;
         case EventTypesEnum['Oba zespoły strzelą gola']:
-          w1 = item.name === 'Tak' && score.fulltime.home > 0 && score.fulltime.away > 0;
-          w2 = item.name === 'Nie' && (score.fulltime.home === 0 || score.fulltime.away === 0);
+          w1 = item.name === 'Tak' && goals.home > 0 && goals.away > 0;
+          w2 = item.name === 'Nie' && (goals.home === 0 || goals.away === 0);
 
           if (w1 || w2) {
             item.status = EventStatusEnum.SUCCESS;
@@ -267,7 +265,7 @@ export const runBacktest = async () => {
 
           break;
         case EventTypesEnum['Gole gospodarzy powyżej/poniżej']:
-          const homeGoals = score.fulltime.home;
+          const homeGoals = goals.home;
 
           [uo, value] = item.name.split(' ');
 
@@ -279,7 +277,7 @@ export const runBacktest = async () => {
 
           break;
         case EventTypesEnum['Gole gości powyżej/poniżej']:
-          const awayGoals = score.fulltime.away;
+          const awayGoals = goals.away;
 
           [uo, value] = item.name.split(' ');
 
@@ -299,10 +297,10 @@ export const runBacktest = async () => {
           const isMinus = handicap.includes('-');
           value = parseFloat(handicap.replace('-', ''));
 
-          w1 = fixtureToCheck.teams.home.name === team && isMinus && score.fulltime.home - value > score.fulltime.away;
-          w2 = fixtureToCheck.teams.away.name === team && isMinus && score.fulltime.away - value > score.fulltime.home;
-          w3 = fixtureToCheck.teams.home.name === team && !isMinus && score.fulltime.home + value > score.fulltime.away;
-          w4 = fixtureToCheck.teams.away.name === team && !isMinus && score.fulltime.away + value > score.fulltime.home;
+          w1 = fixtureToCheck.teams.home.name === team && isMinus && goals.home - value > goals.away;
+          w2 = fixtureToCheck.teams.away.name === team && isMinus && goals.away - value > goals.home;
+          w3 = fixtureToCheck.teams.home.name === team && !isMinus && goals.home + value > goals.away;
+          w4 = fixtureToCheck.teams.away.name === team && !isMinus && goals.away + value > goals.home;
 
           if (w1 || w2 || w3 || w4) {
             item.status = EventStatusEnum.SUCCESS;

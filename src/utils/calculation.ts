@@ -28,17 +28,17 @@ export function calculateMatchResultPercentages(
   };
 
   calculatePercentageAndPush(
-    (f) => f.statistic.score.fulltime.home > f.statistic.score.fulltime.away,
+    (f) => f.statistic.goals.home > f.statistic.goals.away,
     homeTeam
   );
 
   calculatePercentageAndPush(
-    (f) => f.statistic.score.fulltime.home === f.statistic.score.fulltime.away,
+    (f) => f.statistic.goals.home === f.statistic.goals.away,
     "Remis"
   );
 
   calculatePercentageAndPush(
-    (f) => f.statistic.score.fulltime.home < f.statistic.score.fulltime.away,
+    (f) => f.statistic.goals.home < f.statistic.goals.away,
     awayTeam
   );
 
@@ -68,17 +68,17 @@ export function calculateDoubleChancePercentages(
   };
 
   calculateAndPush(
-    (f) => f.statistic.score.fulltime.home >= f.statistic.score.fulltime.away,
+    (f) => f.statistic.goals.home >= f.statistic.goals.away,
     `${homeTeam} lub Remis`
   );
 
   calculateAndPush(
-    (f) => f.statistic.score.fulltime.home !== f.statistic.score.fulltime.away,
+    (f) => f.statistic.goals.home !== f.statistic.goals.away,
     `${homeTeam} lub ${awayTeam}`
   );
 
   calculateAndPush(
-    (f) => f.statistic.score.fulltime.home <= f.statistic.score.fulltime.away,
+    (f) => f.statistic.goals.home <= f.statistic.goals.away,
     `${awayTeam} lub Remis`
   );
 
@@ -97,7 +97,7 @@ export function calculateOverUnderPercentages(
     const overPercentage = calculatePercentage(
       analyzedFixtures,
       (f) =>
-        f.statistic.score.fulltime.home + f.statistic.score.fulltime.away >
+        f.statistic.goals.home + f.statistic.goals.away >
         threshold
     );
 
@@ -116,7 +116,7 @@ export function calculateOverUnderPercentages(
     const underPercentage = calculatePercentage(
       analyzedFixtures,
       (f) =>
-        f.statistic.score.fulltime.home + f.statistic.score.fulltime.away <
+        f.statistic.goals.home + f.statistic.goals.away <
         threshold
     );
 
@@ -157,12 +157,12 @@ export function calculateBTTSPercentages(
   };
 
   calculateAndPush(
-    (f) => f.statistic.score.fulltime.home > 0 && f.statistic.score.fulltime.away > 0,
+    (f) => f.statistic.goals.home > 0 && f.statistic.goals.away > 0,
     "Tak"
   );
 
   calculateAndPush(
-    (f) => f.statistic.score.fulltime.home === 0 || f.statistic.score.fulltime.away === 0,
+    (f) => f.statistic.goals.home === 0 || f.statistic.goals.away === 0,
     "Nie"
   );
 
@@ -191,8 +191,8 @@ export function calculateTeamOverUnderPercentages(
     const overPercentage = calculatePercentage(
       fixturesForTeam,
       (f) =>
-        (f.statistic.score.fulltime.home > threshold && f.teams.home.id === teamId) ||
-        (f.statistic.score.fulltime.away > threshold && f.teams.away.id === teamId)
+        (f.statistic.goals.home > threshold && f.teams.home.id === teamId) ||
+        (f.statistic.goals.away > threshold && f.teams.away.id === teamId)
     );
 
     console.log(`---- Powyżej ${threshold}: ${overPercentage.toFixed(2)}%`);
@@ -210,8 +210,8 @@ export function calculateTeamOverUnderPercentages(
     const underPercentage = calculatePercentage(
       fixturesForTeam,
       (f) =>
-        (f.statistic.score.fulltime.home < threshold && f.teams.home.id === teamId) ||
-        (f.statistic.score.fulltime.away < threshold && f.teams.away.id === teamId)
+        (f.statistic.goals.home < threshold && f.teams.home.id === teamId) ||
+        (f.statistic.goals.away < threshold && f.teams.away.id === teamId)
     );
 
     console.log(`---- Poniżej ${threshold}: ${underPercentage.toFixed(2)}%`);
@@ -241,10 +241,10 @@ export function calculateHandicapPercentages(
 
   thresholds.forEach((threshold) => {
     const conditions = [
-      (f:any) => f.statistic.score.fulltime.home - threshold > f.statistic.score.fulltime.away,
-      (f:any) => f.statistic.score.fulltime.away - threshold > f.statistic.score.fulltime.home,
-      (f:any) => f.statistic.score.fulltime.home + threshold > f.statistic.score.fulltime.away,
-      (f:any) => f.statistic.score.fulltime.away + threshold > f.statistic.score.fulltime.home
+      (f:any) => f.statistic.goals.home - threshold > f.statistic.goals.away,
+      (f:any) => f.statistic.goals.away - threshold > f.statistic.goals.home,
+      (f:any) => f.statistic.goals.home + threshold > f.statistic.goals.away,
+      (f:any) => f.statistic.goals.away + threshold > f.statistic.goals.home
     ];
 
     const names = [
