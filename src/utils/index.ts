@@ -1,3 +1,4 @@
+import { ITeam, Team } from "../models";
 import { ILikelyType, IOptions } from "../types";
 
 export const createOptions = ({ params, path }: IOptions) => {
@@ -44,4 +45,23 @@ export function groupByFixtureId(elements: ILikelyType[]): Record<number, ILikel
     accumulator[current.fixtureId].push(current);
     return accumulator;
   }, {} as Record<number, ILikelyType[]>);
+}
+
+export async function insertOrUpdateTeams(documents: ITeam[]) {
+  for (const doc of documents) {
+    // Check if the team with the given ID already exists
+    const existingTeam = await Team.findOne({ id: doc.id });
+
+    if (existingTeam) {
+      // If the team exists, check if the season year already exists
+      if (!existingTeam.season.includes(doc.season[0])) { // Assuming doc.season is an array with one year
+        // Add the year to the season array
+        existingTeam.season.push(doc.season[0]);
+        await existingTeam.save();
+      }
+    } else {
+      // If the team does not exist, insert the new document
+      await Team.create(doc);
+    }
+  }
 }

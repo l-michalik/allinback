@@ -1,5 +1,5 @@
 import { createOptions, isArrayEmpty } from "../utils";
-import { supportedLiguesTopFive } from "../constants";
+import { supportedLigues } from "../constants";
 import { Statistic } from "../models/Statistic";
 import { Fixture } from "../models/Fixtures";
 import { League } from "../models/Leagues";
@@ -10,12 +10,13 @@ import axios from "axios";
 export const createFixtures = async (year: number) => {
   let documents: any[] = [];
   const leaguesModels = [];
+  let teamsCreated = 1;
 
   try {
     await dbConnect();
 
     const leagues = await League.find({
-      id: { $in: supportedLiguesTopFive },
+      id: { $in: supportedLigues },
     }).select("id name");
 
     leaguesModels.push(...leagues);
@@ -50,6 +51,7 @@ export const createFixtures = async (year: number) => {
               League.findOne({ id: ligue.id }).select("_id"),
               Team.findOne({ id: teams.home.id }).select("_id"),
               Team.findOne({ id: teams.away.id }).select("_id"),
+              
               Statistic.create({
                 id: fixture.id,
                 goals: {
@@ -86,11 +88,10 @@ export const createFixtures = async (year: number) => {
 
         await Fixture.insertMany(documents);
 
-        console.log(`Loading... (${idx + 1 / supportedLiguesTopFive.length})`);
-
         console.log(
-          `Season fixtures for ${ligue.name} : ${year} updated successfully! [${documents.length}]`
+          `Season fixtures for ${ligue.name} : ${year} updated successfully! [${documents.length}] | ${teamsCreated} of ${supportedLigues.length}`
         );
+        teamsCreated++;
       } catch (error) {
         console.log(error);
       }

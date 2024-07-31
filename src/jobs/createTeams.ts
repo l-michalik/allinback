@@ -1,20 +1,20 @@
-import { createOptions, isArrayEmpty } from "../utils";
-import { supportedLiguesTopFive } from "../constants";
+import { createOptions, insertOrUpdateTeams, isArrayEmpty } from "../utils";
+import { supportedLigues } from "../constants";
 import { League } from "../models/Leagues";
 import dbConnect from "../lib/dbConnect";
-import { Team } from "../models/Teams";
 
 const axios = require("axios");
 
 export const createTeams = async (year: number) => {
   let documents: any[] = [];
   const leaguesModels = [];
+  let teamsCreated = 1;
 
   try {
     await dbConnect();
 
     const leagues = await League.find({
-      id: { $in: supportedLiguesTopFive },
+      id: { $in: supportedLigues },
     }).select("id name");
 
     leaguesModels.push(...leagues);
@@ -58,10 +58,11 @@ export const createTeams = async (year: number) => {
       try {
         await dbConnect();
 
-        await Team.insertMany(documents);
-
-        console.log(`Teams for ${ligue.name} : ${year} created successfully! [${documents.length}]`);
+        insertOrUpdateTeams(documents);
         
+        console.log(`Teams for ${ligue.name} : ${year} created successfully! [${documents.length}] | ${teamsCreated} of ${supportedLigues.length}`);
+        
+        teamsCreated++;
       } catch (error) {
         console.log(error);
       }

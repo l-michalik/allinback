@@ -3,17 +3,13 @@ import mongoose, { Schema } from "mongoose";
 export interface IStats {
   id: number;
   goals: {
-    home: number | null;
-    away: number | null;
+    home: number;
+    away: number;
   };
   score: {
     halftime: {
-      home: number | null;
-      away: number | null;
-    };
-    fulltime: {
-      home: number | null;
-      away: number | null;
+      home: number;
+      away: number;
     };
   }
 }
@@ -26,22 +22,18 @@ const statisticSchema: Schema = new mongoose.Schema<IStats>({
   goals:{
     home: {
       type: Number,
-      required: true,
     },
     away: {
       type: Number,
-      required: true,
     },
   },
   score: {
     halftime: {
       home: {
         type: Number,
-        required: true,
       },
       away: {
         type: Number,
-        required: true,
       },
     },
   },
