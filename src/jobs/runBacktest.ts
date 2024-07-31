@@ -183,7 +183,7 @@ export const runBacktest = async () => {
   const likelyTypesGrouped = groupByFixtureId(likelyTypes);
 
   Object.keys(likelyTypesGrouped).forEach((fixtureId: any) => {
-    console.log(`- Fixture ID: ${fixtureId}`);
+    // console.log(`- Fixture ID: ${fixtureId}`);
 
     const fixtureToCheck = fixtures.find((f) => f.id === parseInt(fixtureId));
 
