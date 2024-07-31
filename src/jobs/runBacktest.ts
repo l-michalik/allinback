@@ -9,7 +9,7 @@ import {
   calculateHandicapPercentages,
 } from "../utils/calculation";
 import { formatDate, groupByFixtureId, padStringWithSpaces } from "../utils";
-import { EventTypes, EventTypesEnum } from "../constants";
+import { EventTypes, EventTypesEnum, fixturesXCount } from "../constants";
 import dbConnect from "../lib/dbConnect";
 import { Fixture } from "../models";
 import { exit } from "process";
@@ -31,8 +31,7 @@ export const runBacktest = async () => {
 
     fixtures = await Fixture.find({})
       .populate(["statistic", "league", "teams.home", "teams.away"])
-      .sort({ timestamp: -1 })
-      .limit(50);
+      .sort({ timestamp: -1 });
 
     let startDate: any = new Date(start.timestamp * 1000);
     startDate.setHours(0, 0, 0, 0);
@@ -55,9 +54,7 @@ export const runBacktest = async () => {
       startDate = nextDayDate;
       nextDayDate = new Date(nextDayDate.getTime() + 86400000);
 
-      if (fixturesForDate.length === 0) {
-        continue;
-      }
+      if (fixturesForDate.length === 0) continue;
 
       console.log(
         `${padStringWithSpaces(fixturesDate, 27)} | (${fixturesForDate.length
@@ -84,12 +81,12 @@ export const runBacktest = async () => {
                 f.teams.away._id === fixture.teams.away._id) &&
               f.timestamp < fixture.timestamp
           )
-          .slice(-1);
+          .slice(-fixturesXCount);
 
         console.log("-- Available fixtures:", analyzedFixtures.length);
 
-        if (analyzedFixtures.length === 0) {
-          console.log("-- No fixtures to analyze. Skipping...");
+        if (analyzedFixtures.length < fixturesXCount) {
+          console.log("-- No fixtures or to less to analyze. Skipping...");
           return;
         }
 
