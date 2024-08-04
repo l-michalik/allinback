@@ -14,7 +14,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
-  // createFixtures(2021);
-  // createTeams(2021);
-  // runBacktest();
+  // createTeams(2023);
+  // createFixtures(2023);
+  runBacktest();
 });

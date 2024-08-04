@@ -6,7 +6,6 @@ export const EventTypes = [
   "Gole gospodarzy powyżej/poniżej",
   "Gole gości powyżej/poniżej",
   "Handicap",
-  // "Pierwszy gol",
   "Wynik 1. połowy",
   "1. połowa, gole powyżej/poniżej",
 ];
@@ -19,17 +18,20 @@ export const enum EventTypesEnum {
   "Gole gospodarzy powyżej/poniżej" = "Gole gospodarzy powyżej/poniżej",
   "Gole gości powyżej/poniżej" = "Gole gości powyżej/poniżej",
   "Handicap" = "Handicap",
-  // "Pierwszy gol" = "Pierwszy gol",
   "Wynik 1. połowy" = "Wynik 1. połowy",
   "1. połowa, gole powyżej/poniżej" = "1. połowa, gole powyżej/poniżej",
 }
 
 export const supportedLigues = [ 39, 307, 218, 144, 344, 71, 172, 265, 169, 170, 119, 233, 329, 244, 61, 197, 140, 88, 358, 164, 239, 162, 362, 365, 262, 78, 103, 304, 281, 106, 94, 283, 286, 332, 179, 207, 113, 268, 253, 271, 299, 135];
 
-export const supportedLiguesTopFive = [39, 135, 78, 140, 61];
+export const testLeagues = [39, 140, 78, 135, 61, 88, 71, 94, 262, 179];
 
 export const amountOfMatchesToBacktest = [
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
 ];
 
 export const fixturesXCount = 20;
+
+export const fixturesYMinimum = 1;
+
+export const fixturesXWeeks = 10;

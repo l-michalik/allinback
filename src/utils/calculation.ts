@@ -91,7 +91,7 @@ export function calculateOverUnderPercentages(
 ) {
   const result: ILikelyType[] = [];
 
-  const thresholds = [0.5, 1.5, 2.5, 3.5];
+  const thresholds = [1.5, 2.5, 3.5];
 
   thresholds.forEach((threshold) => {
     const overPercentage = calculatePercentage(
@@ -176,7 +176,7 @@ export function calculateTeamOverUnderPercentages(
   teamId: number
 ) {
   const result: ILikelyType[] = [];
-  const thresholds = [0.5, 1.5, 2.5, 3.5];
+  const thresholds = [1.5, 2.5, 3.5];
 
   const fixturesForTeam = analyzedFixtures.filter(
     (f) => f.teams.home.id === teamId || f.teams.away.id === teamId

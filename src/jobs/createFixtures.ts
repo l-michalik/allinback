@@ -1,7 +1,7 @@
 import { createOptions, isArrayEmpty } from "../utils";
-import { supportedLigues } from "../constants";
 import { Statistic } from "../models/Statistic";
 import { Fixture } from "../models/Fixtures";
+import { testLeagues } from "../constants";
 import { League } from "../models/Leagues";
 import dbConnect from "../lib/dbConnect";
 import { Team } from "../models/Teams";
@@ -16,7 +16,7 @@ export const createFixtures = async (year: number) => {
     await dbConnect();
 
     const leagues = await League.find({
-      id: { $in: supportedLigues },
+      id: { $in: testLeagues },
     }).select("id name");
 
     leaguesModels.push(...leagues);
@@ -89,7 +89,7 @@ export const createFixtures = async (year: number) => {
         await Fixture.insertMany(documents);
 
         console.log(
-          `Season fixtures for ${ligue.name} : ${year} updated successfully! [${documents.length}] | ${teamsCreated} of ${supportedLigues.length}`
+          `Season fixtures for ${ligue.name} : ${year} updated successfully! [${documents.length}] | ${teamsCreated} of ${testLeagues.length}`
         );
         teamsCreated++;
       } catch (error) {

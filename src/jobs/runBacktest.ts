@@ -9,7 +9,7 @@ import {
   calculateHandicapPercentages,
 } from "../utils/calculation";
 import { formatDate, groupByFixtureId, padStringWithSpaces } from "../utils";
-import { EventTypes, EventTypesEnum, fixturesXCount } from "../constants";
+import { EventTypes, EventTypesEnum, fixturesXCount, fixturesXWeeks, fixturesYMinimum } from "../constants";
 import dbConnect from "../lib/dbConnect";
 import { Fixture } from "../models";
 import { exit } from "process";
@@ -72,6 +72,8 @@ export const runBacktest = async () => {
           )} | ${new Date(fixture.timestamp * 1000).toLocaleString()}`
         );
 
+        // add filter that only take fixtures from the last week before the fixture
+        
         const analyzedFixtures = fixtures
           .filter(
             (f) =>
@@ -79,13 +81,14 @@ export const runBacktest = async () => {
                 f.teams.away._id === fixture.teams.home._id ||
                 f.teams.home._id === fixture.teams.away._id ||
                 f.teams.away._id === fixture.teams.away._id) &&
-              f.timestamp < fixture.timestamp
+              f.timestamp < fixture.timestamp && 
+              f.timestamp > fixture.timestamp - (604800 * fixturesXWeeks)
           )
-          .slice(-fixturesXCount);
+          // .slice(-fixturesXCount);
 
         console.log("-- Available fixtures:", analyzedFixtures.length);
 
-        if (analyzedFixtures.length < fixturesXCount) {
+        if (analyzedFixtures.length < fixturesYMinimum) {
           console.log("-- No fixtures or to less to analyze. Skipping...");
           return;
         }
@@ -315,6 +318,7 @@ export const runBacktest = async () => {
   });
 
   console.log('### SUMMARY ###');
+  console.log(`FIXTURE COUNT: ${fixtures.length}}`);
   console.log(`PENDING: ${likelyTypes.filter((lt) => lt.status === 'PENDING').length}`);
   console.log(`SUCCESS: ${likelyTypes.filter((lt) => lt.status === 'SUCCESS').length}`);
   console.log(`FAILED: ${likelyTypes.filter((lt) => lt.status === 'FAILED').length}`);
